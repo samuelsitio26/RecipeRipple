@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -160,14 +160,37 @@
 
         table th,
         table td {
-            padding: 10px;
+            padding: 12px 8px;
             text-align: left;
             border: 1px solid #ddd;
+            vertical-align: top;
         }
 
         table th {
             background-color: #603044;
             color: white;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        table td {
+            background-color: white;
+        }
+
+        table tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover td {
+            background-color: #f0f0f0;
+        }
+
+        table img {
+            transition: transform 0.2s ease;
+        }
+
+        table img:hover {
+            transform: scale(1.05);
         }
 
         /* Profile Popup Styling */
@@ -305,7 +328,6 @@
                         <th>Video</th>
                         <th>Bahan</th>
                         <th>Langkah</th>
-                        <th>Gambar</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -315,36 +337,58 @@
                             <td>{{ $recipe->id }}</td>
                             <td>{{ $recipe->name }}</td>
                             <td>
-                                @if ($recipe->image_path)
-                                    <img src="{{ asset('uploads/recipe/image/' . $recipe->image_path) }}"
-                                        width="100" height="100" alt="Recipe image">
+                                @if ($recipe->gambar)
+                                    <img src="{{ asset('uploads/recipe/gambar/' . $recipe->gambar) }}" width="100"
+                                        height="100" alt="Recipe image"
+                                        style="object-fit: cover; border-radius: 5px;">
                                 @else
-                                    No image available
+                                    <div style="text-align: center; color: #666; font-style: italic;">No image available
+                                    </div>
                                 @endif
                             </td>
                             <td>{{ Str::limit($recipe->description, 50) }}</td>
                             <td>{{ $recipe->kategori->nama }}</td>
                             <td>
-                                @if ($recipe->video_path)
-                                    <video width="150" height="100" controls>
+                                @if ($recipe->video_type === 'youtube' && $recipe->video_url)
+                                    <iframe width="150" height="100"
+                                        src="{{ $recipe->getVideoEmbedUrlAttribute() }}" frameborder="0"
+                                        style="border-radius: 5px;"></iframe>
+                                @elseif ($recipe->video_type === 'file' && $recipe->video_path)
+                                    <video width="150" height="100" controls style="border-radius: 5px;">
                                         <source src="{{ asset('uploads/recipe/video/' . $recipe->video_path) }}"
                                             type="video/mp4">
                                         Your browser does not support the video tag.
                                     </video>
+                                @elseif ($recipe->video_type === 'url' && $recipe->video_url)
+                                    <iframe width="150" height="100" src="{{ $recipe->video_url }}"
+                                        frameborder="0" style="border-radius: 5px;"></iframe>
                                 @else
-                                    No video available
+                                    <div style="text-align: center; color: #666; font-style: italic;">No video available
+                                    </div>
                                 @endif
                             </td>
-                            <td>{{ $recipe->bahan }}</td>
-                            <td>{{ $recipe->langkah }}</td>
-                            <td>
-                                @if ($recipe->langkah_image)
-                                    @foreach (json_decode($recipe->langkah_image) as $image)
-                                        <img src="{{ asset('uploads/recipe/image/' . $image) }}" width="100"
-                                            height="100" alt="Step image">
-                                    @endforeach
+                            <td
+                                style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                @if (is_array($recipe->bahan))
+                                    {{ implode(', ', array_slice($recipe->bahan, 0, 3)) }}
+                                    @if (count($recipe->bahan) > 3)
+                                        <span style="color: #666; font-style: italic;">... ({{ count($recipe->bahan) }}
+                                            total)</span>
+                                    @endif
                                 @else
-                                    No images available
+                                    {{ Str::limit($recipe->bahan, 50) }}
+                                @endif
+                            </td>
+                            <td
+                                style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                @if (is_array($recipe->langkah))
+                                    {{ implode(', ', array_slice($recipe->langkah, 0, 2)) }}
+                                    @if (count($recipe->langkah) > 2)
+                                        <span style="color: #666; font-style: italic;">...
+                                            ({{ count($recipe->langkah) }} steps)</span>
+                                    @endif
+                                @else
+                                    {{ Str::limit($recipe->langkah, 50) }}
                                 @endif
                             </td>
                             <td>

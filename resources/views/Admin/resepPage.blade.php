@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -241,8 +241,8 @@
         <a href="/admin/user"><i class="fas fa-user"></i>User</a>
         <a class="active" href="/admin/resep"><i class="fas fa-book"></i>Resep</a>
 
-        <a href="{{route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
-        <a href="{{route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
+        <a href="{{ route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
+        <a href="{{ route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
         <a href="/admin/komentar"><i class="fas fa-comments"></i>Komentar</a>
     </div>
 
@@ -274,39 +274,62 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Contoh Data Resep -->
-                <tr>
-                    <td><img src="{{ url('../frontend/images/nasigoreng.png') }}" alt="Recipe Image"></td>
-                    <td>Nasi Goreng</td>
-                    <td>Main Course</td>
-                    <td>Nasi goreng lezat dengan bumbu spesial</td>
-                    <td>
-                        <button class="btn-view" onclick="viewRecipe()">Lihat</button>
-                        <button class="btn-edit" onclick="editRecipe()">Edit</button>
-                        <button class="btn-delete" onclick="deleteRecipe()">Hapus</button>
-                    </td>
-                </tr>
-                <!-- Data resep lainnya dapat ditampilkan di sini -->
+                @forelse ($recipes as $recipe)
+                    <tr>
+                        <td>
+                            @if ($recipe->image_path)
+                                <img src="{{ asset('uploads/recipe/image/' . $recipe->image_path) }}" alt="Recipe Image"
+                                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                            @else
+                                <img src="{{ url('../frontend/images/placeholder.png') }}" alt="No Image"
+                                    style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                            @endif
+                        </td>
+                        <td>{{ $recipe->name }}</td>
+                        <td>{{ $recipe->kategori->nama ?? 'No Category' }}</td>
+                        <td>{{ Str::limit($recipe->description, 50) }}</td>
+                        <td>
+                            <button class="btn-view"
+                                onclick="window.location.href='{{ route('recipe.show', $recipe->id) }}'">Lihat</button>
+                            <button class="btn-edit"
+                                onclick="window.location.href='{{ route('recipe.edit', $recipe->id) }}'">Edit</button>
+                            <form action="{{ route('recipe.destroy', $recipe->id) }}" method="POST"
+                                style="display: inline;"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus resep ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-delete">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #666;">
+                            Belum ada resep yang tersedia
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
     <!-- Profile Popup for Logout -->
-        <div class="profile-popup" id="profilePopup">
-            <div class="d-flex align-items-center">
-                <img src="{{ url('../frontend/images/profile1.jpg') }}" alt="User Profile" class="rounded-circle" width="40" height="40"/>
-                <div style="margin-left: 10px;">
-                    <a href="/profil">
-                        <h5>Admin</h5>
-                    </a>
-                    <p>admin@gmail.com</p>
-                </div>
+    <div class="profile-popup" id="profilePopup">
+        <div class="d-flex align-items-center">
+            <img src="{{ url('../frontend/images/profile1.jpg') }}" alt="User Profile" class="rounded-circle"
+                width="40" height="40" />
+            <div style="margin-left: 10px;">
+                <a href="/profil">
+                    <h5>Admin</h5>
+                </a>
+                <p>admin@gmail.com</p>
             </div>
-            <form action="{{ route('logout') }}" method="POST" style="margin-top: 10px;">
-                @csrf
-                <button type="submit">Keluar</button>
-            </form>
         </div>
+        <form action="{{ route('logout') }}" method="POST" style="margin-top: 10px;">
+            @csrf
+            <button type="submit">Keluar</button>
+        </form>
+    </div>
 
     <script>
         function toggleSidebar() {
@@ -362,4 +385,5 @@
         }
     </script>
 </body>
+
 </html>

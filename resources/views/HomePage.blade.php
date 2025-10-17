@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -250,7 +250,7 @@
             <div class="about-content">
                 <h2 style="color: black;">About Us</h2>
                 <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to
-                    discover, share, and enjoy recipes from around the world. Whether you’re a beginner or an
+                    discover, share, and enjoy recipes from around the world. Whether youâ€™re a beginner or an
                     experienced cook, we provide an easy way to explore new dishes, upload your own creations, and
                     engage with a vibrant community.</p>
                 <p>Join us in spreading the joy of cooking, one recipe at a time!</p>

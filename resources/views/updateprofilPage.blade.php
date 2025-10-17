@@ -1,4 +1,4 @@
-{{-- <!DOCTYPE html>
+﻿{{-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <title>Update Profile</title>
@@ -154,7 +154,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/notifikasi" style="display: flex; flex-direction: column; align-items: center;">
-            <i class="fas fa-bell"></i> Notifikasi
+            <i class="fas fa-bell"></i> Resep Saya
           </a>
         </li>
         <li class="nav-item">
@@ -198,7 +198,7 @@
   <!-- About Us & Social Media Links -->
   <div class="about-container">
     <h2>About Us</h2>
-    <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to discover, share, and enjoy recipes from around the world. Whether you’re a beginner or an experienced cook, we provide an easy way to explore new dishes, upload your own creations, and engage with a vibrant community.</p>
+    <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to discover, share, and enjoy recipes from around the world. Whether youâ€™re a beginner or an experienced cook, we provide an easy way to explore new dishes, upload your own creations, and engage with a vibrant community.</p>
     <p>Join us in spreading the joy of cooking, one recipe at a time!</p>
     <h2>Contact</h2>
     <div class="social-icons-container">

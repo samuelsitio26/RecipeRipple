@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Recipe;
 use App\Models\Comment;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -145,6 +146,12 @@ class Resep extends Controller
             return back()->withErrors(['error' => 'Failed to perform search.']);
         }
 
+    }
+
+    public function show_all() {
+        $data['resep'] = DB::table('recipes')->get()->toArray();
+
+        return view('searchresepPage', compact('data'));
     }
 
 }

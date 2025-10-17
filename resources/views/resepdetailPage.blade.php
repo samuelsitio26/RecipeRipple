@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 
 <head>
     <title>Recipe Ripple</title>
@@ -138,6 +138,30 @@
             width: 100%;
             margin-top: 1rem;
         }
+
+        .bton-custom {
+            display: inline-block;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .bton-custom:hover {
+            background-color: #e2e6ea;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input[type="file"] {
+            display: none;
+        }
     </style>
 </head>
 
@@ -149,73 +173,109 @@
             Recipe <span style="color: orange;">Ripple</span>
         </a>
         <div>
-            <form action="{{ route('recipe.store') }}" method="POST" id="recipe-form" enctype="multipart/form-data">
-                <button type="submit" class="btn btn-custom">Unggah</button>
-                <button type="reset" class="btn btn-custom">Hapus</button>
+            <button type="submit" form="recipe-form" class="btn btn-custom">Unggah</button>
+            <a href="/beranda" class="btn btn-custom">Batal</a>
         </div>
     </nav>
     <div class="container">
-        <div class="video-placeholder" id="videoIconLabel">
-            <i class="fas fa-play-circle"></i>
-        </div>
-        <input type="file" id="videoInput" name="video" accept="video/*">
-        <input type="text" id="videoUrlInput" class="form-control" name="video_url"
-            placeholder="Atau masukkan link YouTube">
-        <video id="videoPreview" controls></video>
-        <iframe id="videoIframe" src="" frameborder="0"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <button type="button" id="removeVideoButton" class="btn btn-danger" style="display:none;">Hapus Video</button>
-        <p class="text-center">Tambahkan video resep Anda!</p>
-        @csrf
-        <input type="text" class="form-control" id="name" name="name"
-            placeholder="Judul : Nasi Goreng Telur Mata Sapi" required>
-        <textarea class="form-control" id="description" name="description" rows="3"
-            placeholder="Cerita di balik masakan anda. Bagaimana hal tersebut menginspirasimu? Deskripsikanlah masakan Anda"
-            required></textarea>
-
-        <p class="section-title">Bahan-bahan</p>
-        <div id="bahan-container">
-            <div class="bahan-item">
-                <input type="text" class="form-control" name="bahan[]" placeholder="1 Piring Nasi">
+        <form action="{{ route('recipe.store') }}" method="POST" id="recipe-form" enctype="multipart/form-data">
+            @csrf
+            <div class="video-placeholder" id="videoIconLabel">
+                <i class="fas fa-play-circle"></i>
             </div>
-            <div class="bahan-item">
-                <input type="text" class="form-control" name="bahan[]" placeholder="1 butir telur">
-            </div>
-        </div>
-        <div class="add-button" id="add-bahan">
-            <i class="fas fa-plus-circle"></i> Tambah Bahan
-        </div>
+            <input type="file" id="videoInput" name="video" accept="video/*">
+            <input type="text" id="videoUrlInput" class="form-control" name="video_url"
+                placeholder="Atau masukkan link YouTube">
+            <video id="videoPreview" controls></video>
+            <iframe id="videoIframe" src="" frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            <button type="button" id="removeVideoButton" class="btn btn-danger" style="display:none;">Hapus
+                Video</button>
+            <p class="text-center">Tambahkan video resep Anda!</p>
 
-        <p class="section-title">Langkah-langkah</p>
-        <div id="langkah-container">
-            <div class="langkah-item">
-                <input type="text" class="form-control" name="langkah[]"
-                    placeholder="Iris bawang merah menjadi beberapa bagian">
-                <div class="step-image-placeholder" id="imagePlaceholder1">
-                    <i class="fas fa-camera"></i>
+            <div class="form-group">
+                <label for="kategori_id">Kategori:</label>
+                <select class="form-control" id="kategori_id" name="kategori_id" required>
+                    <option value="">Pilih Kategori</option>
+                    @if (isset($kategori))
+                        @foreach ($kategori as $kategoriItem)
+                            <option value="{{ $kategoriItem->id }}">{{ $kategoriItem->nama }}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="gambar" class="btn bton-custom">Choose File (Optional)</label>
+                <input type="file" class="form-control-file" id="gambar" name="gambar" accept="image/*">
+                <img id="imagePreview"
+                    style="display: none; width: 50%; max-height: 150px; margin-top: 10px; border-radius: 10px;">
+            </div>
+
+            <input type="text" class="form-control" id="name" name="name"
+                placeholder="Judul : Nasi Goreng Telur Mata Sapi" required>
+            <textarea class="form-control" id="description" name="description" rows="3"
+                placeholder="Cerita di balik masakan anda. Bagaimana hal tersebut menginspirasimu? Deskripsikanlah masakan Anda"
+                required></textarea>
+
+            <p class="section-title">Bahan-bahan</p>
+            <div id="bahan-container">
+                <div class="bahan-item">
+                    <input type="text" class="form-control" name="bahan[]" placeholder="1 Piring Nasi">
                 </div>
-                <input type="file" id="stepImage1" name="langkah_image[]" accept="image/*">
-                <img id="stepPreview1" class="step-image">
-                <span class="remove-button" id="removeImage1">Hapus</span>
-            </div><br>
-            <div class="langkah-item">
-                <input type="text" class="form-control" name="langkah[]"
-                    placeholder="Panaskan minyak makan terlebih dahulu">
-                <div class="step-image-placeholder" id="imagePlaceholder2">
-                    <i class="fas fa-camera"></i>
+                <div class="bahan-item">
+                    <input type="text" class="form-control" name="bahan[]" placeholder="1 butir telur">
                 </div>
-                <input type="file" id="stepImage2" name="langkah_image[]" accept="image/*">
-                <img id="stepPreview2" class="step-image">
-                <span class="remove-button" id="removeImage2">Hapus</span>
-            </div><br>
-        </div>
-        <div class="add-button" id="add-langkah"><br>
-            <i class="fas fa-plus-circle"></i> Tambah Langkah
-        </div>
+            </div>
+            <div class="add-button" id="add-bahan">
+                <i class="fas fa-plus-circle"></i> Tambah Bahan
+            </div>
+
+            <p class="section-title">Langkah-langkah</p>
+            <div id="langkah-container">
+                <div class="langkah-item">
+                    <input type="text" class="form-control" name="langkah[]"
+                        placeholder="Iris bawang merah menjadi beberapa bagian">
+                    <div class="step-image-placeholder" id="imagePlaceholder1">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <input type="file" id="stepImage1" name="langkah_image[]" accept="image/*">
+                    <img id="stepPreview1" class="step-image">
+                    <span class="remove-button" id="removeImage1">Hapus</span>
+                </div><br>
+                <div class="langkah-item">
+                    <input type="text" class="form-control" name="langkah[]"
+                        placeholder="Panaskan minyak makan terlebih dahulu">
+                    <div class="step-image-placeholder" id="imagePlaceholder2">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <input type="file" id="stepImage2" name="langkah_image[]" accept="image/*">
+                    <img id="stepPreview2" class="step-image">
+                    <span class="remove-button" id="removeImage2">Hapus</span>
+                </div><br>
+            </div>
+            <div class="add-button" id="add-langkah"><br>
+                <i class="fas fa-plus-circle"></i> Tambah Langkah
+            </div>
+        </form>
     </div>
-    </form>
 
     <script>
+        // Preview gambar utama
+        document.getElementById('gambar').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imagePreview = document.getElementById('imagePreview');
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
         // Video upload and preview functionality
         const videoInput = document.getElementById('videoInput');
         const videoUrlInput = document.getElementById('videoUrlInput');

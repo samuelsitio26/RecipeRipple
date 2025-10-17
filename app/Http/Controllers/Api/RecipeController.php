@@ -9,7 +9,7 @@ class RecipeController extends Controller
 {
     public function index()
     {
-        return Recipe::all();
+        return Recipe::latest()->paginate(10);
     }
 
     public function store(Request $request)

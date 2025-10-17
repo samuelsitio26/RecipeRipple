@@ -1,4 +1,4 @@
-<!-- Bagian tambahan untuk kategori -->
+﻿<!-- Bagian tambahan untuk kategori -->
 <h2>Daftar Kategori</h2>
 <table class="recipe-table">
     <thead>

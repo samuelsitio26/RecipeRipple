@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -558,9 +558,17 @@
     <div class="container">
         <div class="video-placeholder">
             <div class="video-placeholder">
-                @if ($recipe->video_path)
-                    <iframe class="responsive-iframe" src="{{ asset('uploads/recipe/video/' . $recipe->video_path) }}"
-                        frameborder="0" allowfullscreen></iframe>
+                @if ($recipe->video_type === 'youtube' && $recipe->video_url)
+                    <iframe class="responsive-iframe" src="{{ $recipe->getVideoEmbedUrlAttribute() }}" frameborder="0"
+                        allowfullscreen></iframe>
+                @elseif ($recipe->video_type === 'file' && $recipe->video_path)
+                    <video class="responsive-iframe" controls>
+                        <source src="{{ asset('uploads/recipe/video/' . $recipe->video_path) }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                @elseif ($recipe->video_type === 'url' && $recipe->video_url)
+                    <iframe class="responsive-iframe" src="{{ $recipe->video_url }}" frameborder="0"
+                        allowfullscreen></iframe>
                 @else
                     <p>No video available</p>
                 @endif
@@ -589,7 +597,7 @@
         <p class="section-title">Bahan-bahan</p>
         <div class="text-container" style="margin-bottom: 10px;">
             @php
-                $bahan = explode(', ', $recipe->bahan);
+                $bahan = is_array($recipe->bahan) ? $recipe->bahan : explode(', ', $recipe->bahan);
             @endphp
             @foreach ($bahan as $item)
                 <p>{{ $item }}</p>
@@ -598,8 +606,8 @@
 
         <p class="section-title">Langkah-langkah</p>
         @php
-            $langkah = explode(', ', $recipe->langkah);
-            $langkah_images = json_decode($recipe->langkah_image, true);
+            $langkah = is_array($recipe->langkah) ? $recipe->langkah : explode(', ', $recipe->langkah);
+            $langkah_images = is_array($recipe->langkah_image) ? $recipe->langkah_image : [];
         @endphp
         @foreach ($langkah as $index => $step)
             <div class="text-container">
@@ -685,7 +693,7 @@
     <div class="about-container">
         <h2>About Us</h2>
         <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to discover, share,
-            and enjoy recipes from around the world. Whether you’re a beginner or an experienced cook, we provide an
+            and enjoy recipes from around the world. Whether youâ€™re a beginner or an experienced cook, we provide an
             easy way to explore new dishes, upload your own creations, and engage with a vibrant community.</p>
         <p>Join us in spreading the joy of cooking, one recipe at a time!</p>
         <h2>Contact</h2>
@@ -845,4 +853,3 @@
 </body>
 
 </html>
-

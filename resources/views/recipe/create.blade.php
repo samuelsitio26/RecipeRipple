@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 
 <head>
     <title>Recipe Ripple</title>
@@ -134,12 +134,6 @@
             transform: translate(-50%, -50%);
         }
 
-        .step-image {
-            display: none;
-            max-width: 30%;
-            margin-top: 1rem;
-        }
-
         .bton-custom {
             display: inline-block;
             padding: 5px 10px;
@@ -157,13 +151,57 @@
             background-color: #e2e6ea;
             /* Warna saat di-hover */
         }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group input[type="file"] {
+            display: none;
+        }
+
+        .form-group label[for="gambar"] {
+            background-color: #FF4500;
+            color: white;
+            padding: 0.5rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .form-group img {
+            display: block;
+            width: 50%;
+            max-height: 150px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .step-image {
+            display: none;
+            max-width: 50%;
+            margin-top: 1rem;
+        }
+
+        .step-image-placeholder {
+            background-color: #E0E0E0;
+            height: 150px;
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            margin-top: 1rem;
+            cursor: pointer;
+            position: relative;
+        }
     </style>
 </head>
 
 <body>
     <div>
         <form action="{{ route('recipe.store') }}" method="POST" id="recipe-form" enctype="multipart/form-data">
-
+            @csrf
             <nav class="navbar">
                 <a class="navbar-brand" href="#">
                     <img src="{{ url('frontend/images/logo.png') }}" alt="Recipe Ripple" width="30" class="me-2"
@@ -172,28 +210,39 @@
                 </a>
                 <div class="text-end">
                     <button type="submit" class="btn btn-custom">Unggah</button>
-                    <button type="reset" class="btn btn-custom">Hapus</button>
+                    <a href="/writeresep" class="btn btn-custom" style="text-decoration: none;">Batal</a>
                 </div>
             </nav>
             <div class="container">
                 @if (session()->has('success'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('success') }}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Berhasil!</strong> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
+
                 @if (session()->has('error'))
-                    <div class="alert alert-danger" role="alert">
-                        {{ session('error') }}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Validasi Gagal!</strong> Mohon perbaiki error berikut:
+                        <ul class="mb-0 mt-2">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
 
                 <div class="video-placeholder" id="videoIconLabel">
                     <i class="fas fa-play-circle"></i>
                 </div>
-                <!-- <form action="{{ route('recipe.store') }}" method="POST" id="recipe-form" enctype="multipart/form-data">
-                <button type="submit" class="btn btn-custom">Unggah</button>
-                <button type="reset" class="btn btn-custom">Hapus</button> -->
-                @csrf
                 <input type="file" id="videoInput" name="video" accept="video/*">
                 <video id="videoPreview" controls></video>
 
@@ -213,12 +262,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="gambar">Gambar:</label>
-                    <label for="gambar" class="btn bton-custom">Choose File</label>
-                    <input type="file" class="form-control-file" id="gambar" name="gambar" accept="image/*"
-                        required style="display: none;">
-                    <img id="imagePreview"
-                        style="display: none; width: 100%; max-height: 200px; margin-top: 10px; border-radius: 10px;">
+                    <label for="gambar" class="btn bton-custom">Choose File (Optional)</label>
+                    <input type="file" class="form-control-file" id="gambar" name="gambar" accept="image/*">
+                    <img id="imagePreview" style="display: none;">
                 </div>
 
                 <p class="section-title">Bahan-bahan</p>
@@ -284,7 +330,7 @@
             <i class="fas fa-camera"></i>
         </div>
         <input type="file" id="stepImage${langkahCount}" name="langkah_image[]" accept="image/*" style="display: none;">
-        <img id="stepPreview${langkahCount}" class="step-image" style="display: none; width: 100%; max-height: 200px;">
+        <img id="stepPreview${langkahCount}" class="step-image" style="display: none; max-width: 50%; max-height: 150px;">
         <span class="remove-button" onclick="removeLangkah(this)">Hapus</span>
         <div id="imageControls${langkahCount}" style="display: none; margin-top: 10px;">
     <button type="button" class="replace-button" style="background-color: blue;color: white; border: white; border-radius: 5px;margin: 1px;">Ganti</button>
@@ -349,53 +395,46 @@
         const videoInput = document.getElementById('videoInput');
         const videoPreview = document.getElementById('videoPreview');
         const videoIconLabel = document.getElementById('videoIconLabel');
-        const removeVideoButton = document.createElement('button'); // Create remove button
-        removeVideoButton.innerText = 'Hapus Video'; // Button text
-        removeVideoButton.style.display = 'none'; // Initially hidden
-        removeVideoButton.style.borderColor = 'white'; // No border
-        removeVideoButton.style.backgroundColor = ' #9f0000'; // Red color
-        removeVideoButton.style.color = '#ffffff'; // White text color
-        removeVideoButton.style.margin = '10px'; // Add some margin for spacing
-        removeVideoButton.style.borderRadius = '5px';
-        removeVideoButton.onclick = removeVideo; // Bind remove function
-        videoPreview.parentNode.insertBefore(removeVideoButton, videoPreview.nextSibling); // Insert after preview
-
-        let select;
+        let select = null;
 
         videoIconLabel.addEventListener('click', () => {
-            if (!select) { // Only create the select if it doesn't exist
-                // Create a select element
+            if (!select && !videoIconLabel.querySelector('video') && !videoIconLabel.querySelector('iframe')) {
                 select = document.createElement('select');
-                select.innerHTML = `
-            <option value="">Pilih sumber video</option>
-            <option value="computer">Dari Komputer</option>
-            <option value="youtube">Dari YouTube</option>
-        `;
+                select.className = 'form-select';
                 select.style.padding = "0.5rem";
                 select.style.borderRadius = "5px";
                 select.style.border = "1px solid #ccc";
-                select.style.margin = "5rem 183px";
                 select.style.position = "absolute";
-                select.style.zIndex = "10"; // Ensure it appears above other elements
+                select.style.top = "50%";
+                select.style.left = "50%";
+                select.style.transform = "translate(-50%, -50%)";
+                select.style.width = "80%";
+                select.style.maxWidth = "300px";
+                select.style.zIndex = "10";
+                select.innerHTML = `
+                    <option value="">Pilih sumber video</option>
+                    <option value="file">Upload File (MP4)</option>
+                    <option value="youtube">Link YouTube</option>
+                `;
 
-                // Append the select to the video placeholder
                 videoIconLabel.appendChild(select);
 
-                // Handle selection change
                 select.addEventListener('change', (event) => {
-                    if (event.target.value === 'computer') {
-                        videoInput.click(); // Trigger file input
-                        removeSelect(); // Remove select after choice
-                    } else if (event.target.value === 'youtube') {
-                        const youtubeUrl = prompt("Masukkan link YouTube:");
-                        if (youtubeUrl) {
-                            embedYouTubeVideo(youtubeUrl); // Embed YouTube video
+                    const videoType = event.target.value;
+
+                    if (videoType === 'file') {
+                        videoInput.click();
+                    } else if (videoType === 'youtube') {
+                        const youtubeUrl = prompt(
+                            "Masukkan link YouTube:\n(Format: https://www.youtube.com/watch?v=... atau https://youtu.be/...)"
+                        );
+                        if (youtubeUrl && validateAndEmbedYouTube(youtubeUrl)) {
+                            // Video embedded successfully
                         }
-                        removeSelect(); // Remove select after choice
                     }
+                    removeSelect();
                 });
 
-                // Function to remove after clicking outside
                 document.addEventListener('click', (event) => {
                     if (!videoIconLabel.contains(event.target) && select) {
                         removeSelect();
@@ -405,57 +444,161 @@
         });
 
         function removeSelect() {
-            if (select) {
+            if (select && select.parentNode) {
                 videoIconLabel.removeChild(select);
-                select = null; // Reset the select variable
+                select = null;
             }
+        }
+
+        function validateAndEmbedYouTube(url) {
+            const videoId = extractYouTubeId(url);
+            if (videoId) {
+                embedYouTubeVideo(videoId, url);
+                return true;
+            } else {
+                alert(
+                    "Link YouTube tidak valid. Gunakan format:\n- https://www.youtube.com/watch?v=VIDEO_ID\n- https://youtu.be/VIDEO_ID"
+                );
+                return false;
+            }
+        }
+
+        function extractYouTubeId(url) {
+            // Patterns untuk berbagai format YouTube URL
+            const patterns = [
+                /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i,
+                /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
+            ];
+
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            return null;
+        }
+
+        function embedYouTubeVideo(videoId, originalUrl) {
+            videoIconLabel.innerHTML = `
+                <iframe
+                    width="100%"
+                    height="100%"
+                    src="https://www.youtube.com/embed/${videoId}?enablejsapi=1&origin=${window.location.origin}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    style="border-radius: 10px;">
+                </iframe>
+            `;
+
+            // Create hidden inputs untuk menyimpan data
+            let youtubeUrlInput = document.getElementById('youtube_url_input');
+            if (!youtubeUrlInput) {
+                youtubeUrlInput = document.createElement('input');
+                youtubeUrlInput.type = 'hidden';
+                youtubeUrlInput.id = 'youtube_url_input';
+                youtubeUrlInput.name = 'video_url';
+                videoIconLabel.parentNode.appendChild(youtubeUrlInput);
+            }
+            youtubeUrlInput.value = originalUrl;
+
+            let videoTypeInput = document.getElementById('video_type_input');
+            if (!videoTypeInput) {
+                videoTypeInput = document.createElement('input');
+                videoTypeInput.type = 'hidden';
+                videoTypeInput.id = 'video_type_input';
+                videoTypeInput.name = 'video_type';
+                videoIconLabel.parentNode.appendChild(videoTypeInput);
+            }
+            videoTypeInput.value = 'youtube';
+
+            showRemoveButton();
         }
 
         videoInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
+                // Validate video file
+                const maxSize = 50 * 1024 * 1024; // 50MB
+                const allowedTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/webm'];
+
+                if (file.size > maxSize) {
+                    alert('File video terlalu besar. Maksimal 50MB');
+                    this.value = '';
+                    return;
+                }
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Format video tidak didukung. Gunakan: MP4, MOV, AVI, atau WEBM');
+                    this.value = '';
+                    return;
+                }
+
                 const videoUrl = URL.createObjectURL(file);
-                videoPreview.src = videoUrl;
-                videoPreview.style.display = 'block';
-                videoIconLabel.style.display = 'none';
-                removeVideoButton.style.display = 'block'; // Show remove button
+                videoIconLabel.innerHTML = `
+                    <video width="100%" height="100%" controls style="border-radius: 10px;">
+                        <source src="${videoUrl}" type="${file.type}">
+                        Browser Anda tidak mendukung pemutar video.
+                    </video>
+                `;
+
+                // Set video type to file
+                let videoTypeInput = document.getElementById('video_type_input');
+                if (!videoTypeInput) {
+                    videoTypeInput = document.createElement('input');
+                    videoTypeInput.type = 'hidden';
+                    videoTypeInput.id = 'video_type_input';
+                    videoTypeInput.name = 'video_type';
+                    videoIconLabel.parentNode.appendChild(videoTypeInput);
+                }
+                videoTypeInput.value = 'file';
+
+                // Remove YouTube URL if exists
+                const youtubeUrlInput = document.getElementById('youtube_url_input');
+                if (youtubeUrlInput) {
+                    youtubeUrlInput.remove();
+                }
+
+                showRemoveButton();
             }
         });
 
-        // Function to remove the video
-        function removeVideo() {
-            videoPreview.src = ''; // Clear the video source
-            videoPreview.style.display = 'none'; // Hide the video preview
-            videoIconLabel.style.display = 'block'; // Show the video icon label again
-            removeVideoButton.style.display = 'none'; // Hide the remove button
-            videoInput.value = ''; // Clear the file input
-
-            // Reset to show the video icon again
-            const playIcon = document.createElement('i');
-            playIcon.className = 'fas fa-play-circle';
-            videoIconLabel.innerHTML = ''; // Clear previous content
-            videoIconLabel.appendChild(playIcon); // Append the play icon
-        }
-
-        // Function to embed YouTube video
-        function embedYouTubeVideo(url) {
-            const videoId = extractYouTubeId(url);
-            if (videoId) {
-                videoPreview.src = `https://www.youtube.com/embed/${videoId}`;
-                videoPreview.style.display = 'block';
-                videoIconLabel.style.display = 'none';
-                removeVideoButton.style.display = 'block'; // Show remove button
-            } else {
-                alert("Link YouTube tidak valid.");
+        function showRemoveButton() {
+            let removeBtn = document.getElementById('removeVideoBtn');
+            if (!removeBtn) {
+                removeBtn = document.createElement('button');
+                removeBtn.id = 'removeVideoBtn';
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-danger btn-sm mt-2';
+                removeBtn.innerHTML = '<i class="fas fa-trash me-1"></i>Hapus Video';
+                removeBtn.onclick = removeVideo;
+                videoIconLabel.parentNode.insertBefore(removeBtn, videoIconLabel.nextSibling);
             }
+            removeBtn.style.display = 'block';
         }
 
-        // Helper function to extract YouTube video ID
-        function extractYouTubeId(url) {
-            const regex =
-                /(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=)?([^&]{11})|youtu\.be\/([^&]{11})/;
-            const match = url.match(regex);
-            return match ? match[1] || match[2] : null;
+        function removeVideo() {
+            if (confirm('Apakah Anda yakin ingin menghapus video?')) {
+                // Reset video placeholder
+                videoIconLabel.innerHTML = '<i class="fas fa-play-circle"></i>';
+
+                // Clear video input
+                videoInput.value = '';
+
+                // Remove hidden inputs
+                const youtubeUrlInput = document.getElementById('youtube_url_input');
+                const videoTypeInput = document.getElementById('video_type_input');
+                if (youtubeUrlInput) youtubeUrlInput.remove();
+                if (videoTypeInput) videoTypeInput.remove();
+
+                // Hide remove button
+                const removeBtn = document.getElementById('removeVideoBtn');
+                if (removeBtn) removeBtn.remove();
+
+                // Reset select variable so user can choose again
+                select = null;
+            }
         }
 
         // Adding new ingredients and steps

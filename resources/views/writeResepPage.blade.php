@@ -246,7 +246,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="/notifikasi" style="display: flex; flex-direction: column; align-items: center;">
                     <i class="fas fa-bell"></i>
-                    Notifikasi
+                    Resep Saya
                 </a>
             </li>
             <li class="nav-item">

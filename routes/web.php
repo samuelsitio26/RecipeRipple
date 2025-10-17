@@ -16,6 +16,7 @@ use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RatingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,7 +87,7 @@ Route::get('/writeresep', function () {
 });
 
 
-Route::get('/resep', [Resep::class, 'show'])->name('recipe.show');
+// Route::get('/resep', [Resep::class, 'show'])->name('recipe.show');
 
 
 // Route::get('/notifikasi', [NotifikasiController::class, 'show']);
@@ -111,8 +112,11 @@ Route::put('/profile', [ProfileController::class, 'update'])->name('profile.upda
 Route::get('/resep/{id}', [RecipeController::class, 'show'])->name('resep.show');
 Route::post('/resep/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
-Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
-Route::post('/notifikasi/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
+// Ganti Notifikasi jadi Resep Saya
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifikasi', [RecipeController::class, 'myRecipes'])->name('recipe.my-recipes');
+});
 
 
 Route::middleware(['auth'])->group(function () {
@@ -128,12 +132,11 @@ Route::post('/comments/read/{id}', [NotificationController::class, 'read'])->nam
 Route::get('/comments/readed', [NotificationController::class, 'readed'])->name('comments.readed');
 
 Route::get('/recipes', function () {
-    return view('resepdetailPage');
+    $kategori = \App\Models\Kategori::all();
+    return view('resepdetailPage', compact('kategori'));
 });
 
-Route::get('/resep', function () {
-    return view('searchresepPage');
-});
+Route::get('/resep', [Resep::class, 'show_all']);
 
 Route::get('/resep/cari', [RecipeController::class, 'search'])->name('resep.search');
 
@@ -148,10 +151,10 @@ Route::get('/pencarian', function () {
     return view('pencarianresepPage');
 });
 
-Route::get('/search', [RecipeController::class, 'search'])->name('recipes.search');
+Route::get('/search', [RecipeController::class, 'search'])->name('resep.search');
 
 // Route::resource('kategori', KategoriController::class);
-Route::resource('recipe', RecipeController::class);
+// Route::resource('recipe', RecipeController::class); // DIHAPUS: konflik dengan route manual
 Route::apiResource('recipes', RecipeController::class);
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -182,13 +185,42 @@ Route::delete('/admin/user/{id}', [UserController::class, 'destroy'])->name('use
 
 Route::resource('kategori', KategoriController::class);
 // Route::resource('recipe', RecipeController::class);
-Route::get('/recipe', [RecipeController::class, 'index'])->name('recipe.index');;
+Route::get('/recipe', [RecipeController::class, 'index'])->name('recipe.index');
 Route::get('/recipe/create', [RecipeController::class, 'create'])->name('recipe.create');
 Route::get('/recipe/edit/{id}', [RecipeController::class, 'edit'])->name('recipe.edit');
-// Route::post('/recipe/{id}', [RecipeController::class, 'update'])->name('recipe.update');
 Route::put('/recipe/{id}', [RecipeController::class, 'update'])->name('recipe.update');
 Route::delete('/recipe/{id}', [RecipeController::class, 'destroy'])->name('recipe.destroy');
-Route::post('/recipe/{id?}', [RecipeController::class, 'store'])->name('recipe.store');
+Route::post('/recipe/create', [RecipeController::class, 'store'])->name('recipe.store');
 //usertampilan
-Route::get('/user/{id}', [RecipeController::class, 'dashboard'])->name('user.tampilan');
-Route::get('/user/produk', [RecipeController::class, 'produk'])->name('user.produk');
+Route::get('/recipe/view/{id}', [RecipeController::class, 'dashboard'])->name('user.tampilan');
+Route::get('/recipe/produk', [RecipeController::class, 'produk'])->name('user.produk');
+
+// Rating Routes
+Route::middleware(['auth'])->group(function () {
+    Route::post('/recipe/{recipe}/rating', [RatingController::class, 'store'])->name('rating.store');
+    Route::get('/recipe/{recipe}/rating/user', [RatingController::class, 'getUserRating'])->name('rating.user');
+    Route::delete('/rating/{rating}', [RatingController::class, 'destroy'])->name('rating.destroy');
+});
+
+// Public rating routes
+Route::get('/recipe/{recipe}/ratings', [RatingController::class, 'getRecipeRatings'])->name('rating.list');
+Route::post('/recipe/{recipe}/rating/guest', [RatingController::class, 'store'])->name('rating.guest.store');
+
+// Recipe routes with rating
+Route::get('/recipe/{id}', [RecipeController::class, 'show'])->name('recipe.show');
+Route::get('/recipe/category/{slug}', [RecipeController::class, 'getByCategory'])->name('recipe.by.category');
+Route::get('/recipes/popular', [RecipeController::class, 'getPopular'])->name('recipe.popular');
+Route::get('/recipes/search', [RecipeController::class, 'search'])->name('recipe.search');
+
+// Admin Rating Management
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/ratings', [RatingController::class, 'adminIndex'])->name('admin.ratings.index');
+    Route::delete('/admin/ratings/{rating}', [RatingController::class, 'destroy'])->name('admin.ratings.destroy');
+});
+
+// Homepage dengan data dinamis
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Recipe routes dengan kategori dinamis
+Route::get('/recipe/category/{slug}', [RecipeController::class, 'getByCategory'])->name('recipe.by.category');
+Route::get('/recipes/popular', [RecipeController::class, 'getPopular'])->name('recipe.popular');

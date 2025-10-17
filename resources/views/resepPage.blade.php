@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -474,7 +474,8 @@
 
         <!-- Navigation Links -->
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse" id="n
+a                       vbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/beranda"
@@ -486,7 +487,8 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="searchresep" style="display: flex; flex-direction: column; align-items: center; color:#F44708">
                         <i class="fas fa-book"></i>
-                        Resep
+
+                                            Resep
                     </a>
                 </li>
                 <li class="nav-item">
@@ -499,11 +501,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/notifikasi" style="display: flex; flex-direction: column; align-items: center;">
                         <i class="fas fa-bell"></i>
-                        @if($unreadNotificationsCount > 0)
-                            Notifikasi ({{ $unreadNotificationsCount }})
-                        @else
-                            Notifikasi
-                        @endif
+                        Resep Saya
                     </a>
                 </li>
                 <li class="nav-item">
@@ -605,7 +603,7 @@
         <h2>About Us</h2>
         <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to discover,
             share,
-            and enjoy recipes from around the world. Whether you’re a beginner or an experienced cook, we provide an
+            and enjoy recipes from around the world. Whether youâ€™re a beginner or an experienced cook, we provide an
             easy way to explore new dishes, upload your own creations, and engage with a vibrant community.</p>
         <p>Join us in spreading the joy of cooking, one recipe at a time!</p>
         <h2>Contact</h2>

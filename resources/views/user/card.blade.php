@@ -1,12 +1,14 @@
-<html lang="en">
+﻿<html lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Recipe Ripple</title>
-    <link rel="shortcut icon" type="x-icon" href="{{url('frontend/images/Logo.png')}}">
-    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
+    <link rel="shortcut icon" type="x-icon" href="{{ url('frontend/images/Logo.png') }}">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
@@ -15,6 +17,7 @@
             background-color: #FFF7E6;
             color: #333;
         }
+
         .navbar {
             background-color: #FFFFFF;
             padding: 1rem;
@@ -188,6 +191,7 @@
             transform: scale(1.02);
             transition: all 0.3s ease-in-out;
         }
+
         .load-more {
             display: flex;
             justify-content: center;
@@ -252,17 +256,20 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="{{url('frontend/images/logo.png')}}" alt="Recipe Ripple" width="30" class="me-2" style="border-radius: 50%;">
+            <img src="{{ url('frontend/images/logo.png') }}" alt="Recipe Ripple" width="30" class="me-2"
+                style="border-radius: 50%;">
             Recipe <span style="color: #F44708;">Ripple</span>
         </a>
 
         <!-- Toggler for mobile view -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -270,33 +277,38 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/beranda" style="display: flex; flex-direction: column; align-items: center; ">
+                    <a class="nav-link active" href="/beranda"
+                        style="display: flex; flex-direction: column; align-items: center; ">
                         <i class="fas fa-home"></i>
                         Beranda
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#" style="display: flex; flex-direction: column; align-items: center; color: #F44708;">
+                    <a class="nav-link active" href="#"
+                        style="display: flex; flex-direction: column; align-items: center; color: #F44708;">
                         <i class="fas fa-book"></i>
                         Resep
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/writeresep" style="display: flex; flex-direction: column; align-items: center;">
+                    <a class="nav-link" href="/writeresep"
+                        style="display: flex; flex-direction: column; align-items: center;">
                         <i class="fas fa-pen"></i>
                         Tulis
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/notifikasi" style="display: flex; flex-direction: column; align-items: center;">
+                    <a class="nav-link" href="/notifikasi"
+                        style="display: flex; flex-direction: column; align-items: center;">
                         <i class="fas fa-bell"></i>
-                        Notifikasi
+                        Resep Saya
                     </a>
                 </li>
                 <!-- Profile Link -->
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center" href="#" onclick="toggleProfilePopup()">
-                        <img src="frontend/images/profile1.jpg" alt="User Profile" class="rounded-circle me-2" width="30" height="30"/>
+                        <img src="frontend/images/profile1.jpg" alt="User Profile" class="rounded-circle me-2"
+                            width="30" height="30" />
                         <span>Profil</span>
                     </a>
                 </li>
@@ -307,7 +319,8 @@
     <div class="container">
         <div class="text-center">
             <h1 class="my-4" style="font-weight: bold;">
-                <img alt="Logo" class="me-2" height="50" src="{{url('frontend/images/logo.png')}}" width="50"/>
+                <img alt="Logo" class="me-2" height="50" src="{{ url('frontend/images/logo.png') }}"
+                    width="50" />
                 Recipe <span style="color: #FF4500;">Ripple</span>
             </h1>
         </div>
@@ -321,11 +334,12 @@
 
         <div class="container">
             <div class="row">
-                @foreach($recipes as $recipe)
+                @foreach ($recipes as $recipe)
                     <div class="col-md-4 mb-4">
-                         <!-- Mengatur lebar kolom dan margin antar card -->
+                        <!-- Mengatur lebar kolom dan margin antar card -->
                         <div class="card">
-                            <img alt="Nasi Goreng Kampung" class="card-img-top" height="200" src="{{url('frontend/images/nasi_goreng_kampug.png')}}" width="300"/>
+                            <img alt="Nasi Goreng Kampung" class="card-img-top" height="200"
+                                src="{{ url('frontend/images/nasi_goreng_kampug.png') }}" width="300" />
                             <div class="card-body">
                                 <h5 class="card-title">{{ $recipe->name }}</h5>
                                 <p class="card-text">
@@ -340,51 +354,50 @@
         </div>
 
         <div class="load-more">
-        <button id="loadMoreButton">Tampilkan lebih banyak</button>
+            <button id="loadMoreButton">Tampilkan lebih banyak</button>
         </div>
 
         <script>
-        const moreRecipes = [
-            {
-                href: "/resep/nasi-goreng-seafood",
-                imgSrc: "{{url('frontend/images/Nasi_Goreng_Seafood.png')}}",
-                imgAlt: "Nasi Goreng Seafood",
-                title: "Resep Nasi Goreng Seafood, Lezat Segar",
-                rating: 4.7,
-            },
-            {
-                href: "/resep/nasi-goreng-vegetarian",
-                imgSrc: "{{url('frontend/images/Nasi_Goreng_Vegetarian.png')}}",
-                imgAlt: "Nasi Goreng Vegetarian",
-                title: "Resep Nasi Goreng Vegetarian, Sehat dan Enak",
-                rating: 4.5,
-            },
+            const moreRecipes = [{
+                    href: "/resep/nasi-goreng-seafood",
+                    imgSrc: "{{ url('frontend/images/Nasi_Goreng_Seafood.png') }}",
+                    imgAlt: "Nasi Goreng Seafood",
+                    title: "Resep Nasi Goreng Seafood, Lezat Segar",
+                    rating: 4.7,
+                },
+                {
+                    href: "/resep/nasi-goreng-vegetarian",
+                    imgSrc: "{{ url('frontend/images/Nasi_Goreng_Vegetarian.png') }}",
+                    imgAlt: "Nasi Goreng Vegetarian",
+                    title: "Resep Nasi Goreng Vegetarian, Sehat dan Enak",
+                    rating: 4.5,
+                },
 
-            {
-                href: "/resep/nasi-goreng-ayam",
-                imgSrc: "{{url('frontend/images/Nasi_Goreng_Ayam.png')}}",
-                imgAlt: "Nasi Goreng Ayam",
-                title: "Resep Nasi Goreng Ayam, Gurih dan Lezat",
-                rating: 4.6,
-            },
+                {
+                    href: "/resep/nasi-goreng-ayam",
+                    imgSrc: "{{ url('frontend/images/Nasi_Goreng_Ayam.png') }}",
+                    imgAlt: "Nasi Goreng Ayam",
+                    title: "Resep Nasi Goreng Ayam, Gurih dan Lezat",
+                    rating: 4.6,
+                },
 
-            {
-                href: "/resep/nasi-goreng-teri",
-                imgSrc: "{{url('frontend/images/Nasi_Goreng_Teri.png')}}",
-                imgAlt: "Nasi Goreng Teri",
-                title: "Resep Nasi Goreng Teri, Gurih dan Renyah",
-                rating: 4.3,
-            },
-        ];
+                {
+                    href: "/resep/nasi-goreng-teri",
+                    imgSrc: "{{ url('frontend/images/Nasi_Goreng_Teri.png') }}",
+                    imgAlt: "Nasi Goreng Teri",
+                    title: "Resep Nasi Goreng Teri, Gurih dan Renyah",
+                    rating: 4.3,
+                },
+            ];
 
-        let recipesDisplayed = false;
-        document.getElementById("loadMoreButton").addEventListener("click", function() {
-        if (!recipesDisplayed) {
-            const container = document.querySelector(".row");
-            moreRecipes.forEach(recipe => {
-                const col = document.createElement("div");
-                col.className = "col-md-6 col-lg-3 mb-4";
-                col.innerHTML = `
+            let recipesDisplayed = false;
+            document.getElementById("loadMoreButton").addEventListener("click", function() {
+                if (!recipesDisplayed) {
+                    const container = document.querySelector(".row");
+                    moreRecipes.forEach(recipe => {
+                        const col = document.createElement("div");
+                        col.className = "col-md-6 col-lg-3 mb-4";
+                        col.innerHTML = `
                     <a href="${recipe.href}" class="text-decoration-none">
                         <div class="card">
                             <img src="${recipe.imgSrc}" alt="${recipe.imgAlt}" class="card-img-top" height="200" width="300"/>
@@ -398,18 +411,20 @@
                         </div>
                     </a>
                 `;
-                container.appendChild(col);
+                        container.appendChild(col);
+                    });
+                    recipesDisplayed = true;
+                    this.style.display = 'none';
+                }
             });
-            recipesDisplayed = true;
-            this.style.display = 'none';
-        }
-        });
         </script>
 
     </div>
     <div class="about-container">
         <h2>About Us</h2>
-        <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to discover, share, and enjoy recipes from around the world. Whether you’re a beginner or an experienced cook, we provide an easy way to explore new dishes, upload your own creations, and engage with a vibrant community.</p>
+        <p>At RecipeRipple, we believe that cooking connects people. Our platform allows food lovers to discover, share,
+            and enjoy recipes from around the world. Whether youâ€™re a beginner or an experienced cook, we provide an
+            easy way to explore new dishes, upload your own creations, and engage with a vibrant community.</p>
         <p>Join us in spreading the joy of cooking, one recipe at a time!</p>
         <h2>Contact</h2>
         <div class="social-icons-container">
@@ -446,15 +461,15 @@
             popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
         }
 
-    // Hide popup when clicking outside
-    window.onclick = function(event) {
-      const popup = document.getElementById('profilePopup');
-      if (!event.target.closest('.nav-link') && !event.target.closest('#profilePopup')) {
-        popup.style.display = 'none'; // Hide popup
-      }
-    }
-  </script>
-   <script>
+        // Hide popup when clicking outside
+        window.onclick = function(event) {
+            const popup = document.getElementById('profilePopup');
+            if (!event.target.closest('.nav-link') && !event.target.closest('#profilePopup')) {
+                popup.style.display = 'none'; // Hide popup
+            }
+        }
+    </script>
+    <script>
         function logout() {
             alert("Logout clicked!");
         }
@@ -462,9 +477,10 @@
         window.onclick = function(event) {
             const popup = document.getElementById('profilePopup');
             if (!event.target.closest('.nav-link') && !event.target.closest('#profilePopup')) {
-            popup.style.display = 'none';
+                popup.style.display = 'none';
             }
         }
     </script>
 </body>
+
 </html>
