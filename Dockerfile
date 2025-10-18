@@ -28,5 +28,6 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 8080
 
-# Use startup script that runs migrations before starting server
-CMD ["/usr/local/bin/docker-entrypoint.sh"]
+# Temporarily skip startup script to test npm error
+# CMD ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["frankenphp", "php-server", "--listen", ":8080"]
