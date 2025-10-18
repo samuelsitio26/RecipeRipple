@@ -22,7 +22,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs boots
 
 RUN php artisan config:cache && php artisan event:cache && php artisan route:cache && php artisan view:cache
 
+# Copy startup script and make it executable
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 8080
 
-# Use FrankenPHP directly without Octane
-CMD ["frankenphp", "php-server", "--listen", ":8080"]
+# Use startup script that runs migrations before starting server
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
