@@ -142,7 +142,7 @@ Route::get('/search', [RecipeController::class, 'search'])->name('resep.search')
 
 // Route::resource('kategori', KategoriController::class);
 // Route::resource('recipe', RecipeController::class); // DIHAPUS: konflik dengan route manual
-Route::apiResource('recipes', RecipeController::class);
+// Route::apiResource('recipes', RecipeController::class); // DIHAPUS: konflik dengan manual recipe routes
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/resep', [RecipeController::class, 'adminIndex'])->name('admin.recipes.index');
