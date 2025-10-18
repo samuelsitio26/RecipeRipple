@@ -138,7 +138,7 @@ Route::get('/pencarian', function () {
     return view('pencarianresepPage');
 });
 
-Route::get('/search', [RecipeController::class, 'search'])->name('resep.search');
+Route::get('/search', [RecipeController::class, 'search'])->name('search');
 
 // Route::resource('kategori', KategoriController::class);
 // Route::resource('recipe', RecipeController::class); // DIHAPUS: konflik dengan route manual
