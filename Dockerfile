@@ -24,4 +24,5 @@ RUN php artisan config:cache && php artisan event:cache && php artisan route:cac
 
 EXPOSE 8080
 
-CMD ["php", "artisan", "octane:frankenphp", "--host=0.0.0.0", "--port=8080"]
+# Use FrankenPHP directly without Octane
+CMD ["frankenphp", "php-server", "--listen", ":8080"]
