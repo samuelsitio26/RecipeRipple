@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -26,7 +26,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy application files
-COPY . /var/www/html
+COPY . .
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
@@ -35,22 +35,9 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install && npm run build
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var-/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Expose port
+EXPOSE 8000
 
-# Configure Apache DocumentRoot
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Copy custom Apache configuration
-COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
-
-# Expose port 80
-EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
+# Start command will be handled by Procfile
