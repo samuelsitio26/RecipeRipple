@@ -16,9 +16,9 @@ COPY . .
 
 RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs && rm -rf /var/lib/apt/lists/*
-
-RUN npm ci && npm run build && npm prune --omit=dev
+# Skip npm build - assets already built locally and committed
+# RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs && rm -rf /var/lib/apt/lists/*
+# RUN npm ci && npm run build && npm prune --omit=dev
 
 RUN php artisan config:cache && php artisan event:cache && php artisan route:cache && php artisan view:cache
 
