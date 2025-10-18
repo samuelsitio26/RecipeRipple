@@ -99,24 +99,21 @@ Route::redirect('/updateprofil', '/editprofil', 301);
 //Route::post('/updateprofil',[ProfileController::class, 'update'] )->name('updateprofil');
 
 Route::get('/resep/{id}', [RecipeController::class, 'show'])->name('resep.show');
-Route::post('/resep/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
+
+// Comment routes - consolidated with auth middleware
+Route::middleware(['auth'])->group(function () {
+    Route::post('/resep/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::post('/comments/add', [RecipeController::class, 'addComment'])->name('comments.add');
+});
+
 Route::delete('/comments/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+Route::delete('/comment/{id}', [RecipeController::class, 'destroyComment'])->name('comment.destroy');
+Route::put('/comment/{id}/update', [RecipeController::class, 'updateComment'])->name('comment.update');
 
 // Ganti Notifikasi jadi Resep Saya
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifikasi', [RecipeController::class, 'myRecipes'])->name('recipe.my-recipes');
 });
-
-
-// Route komentar tetap perlu auth
-Route::middleware(['auth'])->group(function () {
-    Route::post('/resep/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
-});
-// Route::match(['get', 'post'], '/resep/{id}', [RecipeController::class, 'show'])->name('recipe.show');
-Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
-Route::post('/comments/add', [RecipeController::class, 'addComment']);
-Route::delete('/comment/{id}', [RecipeController::class, 'destroyComment'])->name('comment.destroy');
-Route::put('/comment/{id}/update', [RecipeController::class, 'updateComment'])->name('comment.update');
 
 Route::post('/comments/read/{id}', [NotificationController::class, 'read'])->name('comments.read');
 Route::get('/comments/readed', [NotificationController::class, 'readed'])->name('comments.readed');
