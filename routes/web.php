@@ -91,6 +91,11 @@ Route::get('/writeresep', function () {
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/editprofil', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+// Legacy route aliases (backward compatibility)
+// Redirect old paths to the new canonical ones to avoid 404s
+Route::redirect('/profil', '/profile', 301);
+Route::redirect('/updateprofil', '/editprofil', 301);
 //Route::post('/updateprofil',[ProfileController::class, 'update'] )->name('updateprofil');
 
 Route::get('/resep/{id}', [RecipeController::class, 'show'])->name('resep.show');
