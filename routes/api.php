@@ -29,13 +29,10 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 
-Route::middleware('auth:sanctum')->get('/profile', [ProfileController::class, 'show']);
-Route::middleware('auth:sanctum')->put('/profile', [ProfileController::class, 'update']);
-
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('api.profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('api.profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('api.profile.destroy');
 });
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {

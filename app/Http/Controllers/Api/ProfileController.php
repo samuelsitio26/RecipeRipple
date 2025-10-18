@@ -13,9 +13,9 @@ class ProfileController extends Controller
 
         // Tambahkan link HATEOAS
         $user->links = [
-            'self' => route('profile.show'),
-            'update' => route('profile.update'),
-            'delete' => route('profile.destroy'),
+            'self' => route('api.profile.show'),
+            'update' => route('api.profile.update'),
+            'delete' => route('api.profile.destroy'),
         ];
 
         return response()->json($user); // Mengembalikan data pengguna dalam format JSON
@@ -42,9 +42,9 @@ class ProfileController extends Controller
 
         // Tambahkan link HATEOAS
         $user->links = [
-            'self' => route('profile.show'),
-            'update' => route('profile.update'),
-            'delete' => route('profile.destroy'),
+            'self' => route('api.profile.show'),
+            'update' => route('api.profile.update'),
+            'delete' => route('api.profile.destroy'),
         ];
 
         // Mengembalikan respon sukses
