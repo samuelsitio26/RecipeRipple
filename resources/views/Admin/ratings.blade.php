@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comment Management</title>
+    <title>Rating Management</title>
     <link rel="shortcut icon" type="x-icon" href="{{ url('frontend/images/Logo.png') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
@@ -156,48 +156,77 @@
             background-color: #ff6347;
         }
 
-        .comment-table {
+        .rating-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
 
-        .comment-table th,
-        .comment-table td {
+        .rating-table th,
+        .rating-table td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
 
-        .comment-table th {
+        .rating-table th {
             background-color: #603044;
             color: white;
         }
 
-        .btn-view,
-        .btn-delete,
-        .btn-tampilkan {
+        .rating-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .rating-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .stars {
+            color: #FFD700;
+        }
+
+        .btn-delete {
             padding: 5px 10px;
             border: none;
             border-radius: 5px;
+            background-color: #de302a;
             color: white;
             cursor: pointer;
         }
 
-        .btn-view {
-            background-color: #3498db;
-        }
-
-        .btn-view:hover {
-            background-color: #2980b9;
-        }
-
-        .btn-delete {
-            background-color: #de302a;
-        }
-
         .btn-delete:hover {
             background-color: #c0211b;
+        }
+
+        .stats-card {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #603044;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -211,11 +240,10 @@
         </div>
         <a href="/admin"><i class="fas fa-home"></i>Dashboard</a>
         <a href="admin/user"><i class="fas fa-user"></i>User</a>
-        {{-- <a href="/admin/resep"><i class="fas fa-book"></i>Resep</a> --}}
         <a href="{{ route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
         <a href="{{ route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
-        <a href="{{ route('admin.ratings.index') }}"><i class="fas fa-star"></i>Ratings</a>
-        <a class="active" href="{{ route('admin.comments.index') }}"><i class="fas fa-comments"></i>Komentar</a>
+        <a class="active" href="{{ route('admin.ratings.index') }}"><i class="fas fa-star"></i>Ratings</a>
+        <a href="{{ route('admin.comments.index') }}"><i class="fas fa-comments"></i>Komentar</a>
     </div>
 
     <!-- Main Content -->
@@ -223,32 +251,33 @@
         <div class="header">
             <div class="menu" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
             <div class="profile" onclick="toggleProfilePopup()">
-                <img alt="Profile Picture" src="{{ url('../frontend/images/profile1.jpg') }}" width="40"
-                    height="40" />
+                <img alt="User" height="40" src="{{ url('../frontend/images/profile1.jpg') }}" width="40" />
                 <span>Admin</span>
             </div>
         </div>
 
-        <!-- Comment Management Section -->
-        <h2>Manage Comments</h2>
+        <!-- Rating Management Section -->
+        <h2>Manage Ratings</h2>
 
         <!-- Statistics Cards -->
-        <div
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-            <div
-                style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #603044;">{{ $totalComments ?? 0 }}</div>
-                <div style="color: #666; margin-top: 5px;">Total Comments</div>
+        <div class="stats-grid">
+            <div class="stats-card">
+                <div class="stat-item">
+                    <div class="stat-number">{{ $totalRatings ?? 0 }}</div>
+                    <div class="stat-label">Total Ratings</div>
+                </div>
             </div>
-            <div
-                style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #603044;">{{ $recentComments ?? 0 }}</div>
-                <div style="color: #666; margin-top: 5px;">This Week</div>
+            <div class="stats-card">
+                <div class="stat-item">
+                    <div class="stat-number">{{ number_format($averageRating ?? 0, 1) }}</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
             </div>
-            <div
-                style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); text-align: center;">
-                <div style="font-size: 2em; font-weight: bold; color: #603044;">{{ $unreadComments ?? 0 }}</div>
-                <div style="color: #666; margin-top: 5px;">Unread</div>
+            <div class="stats-card">
+                <div class="stat-item">
+                    <div class="stat-number">{{ $topRatedRecipes ?? 0 }}</div>
+                    <div class="stat-label">Top Rated Recipes</div>
+                </div>
             </div>
         </div>
 
@@ -267,44 +296,42 @@
             </div>
         @endif
 
-        <table class="comment-table">
+        <!-- Ratings Table -->
+        <table class="rating-table">
             <thead>
                 <tr>
-                    <th>User Name</th>
+                    <th>User</th>
                     <th>Recipe</th>
-                    <th>Comment</th>
+                    <th>Rating</th>
                     <th>Date</th>
-                    <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($comments as $comment)
+                @forelse($ratings as $rating)
                     <tr>
-                        <td>{{ $comment->user->name ?? 'Unknown User' }}</td>
-                        <td>{{ $comment->recipe->name ?? 'Unknown Recipe' }}</td>
-                        <td style="max-width: 200px; word-wrap: break-word;">
-                            {{ Str::limit($comment->comment_text, 100) }}
-                        </td>
-                        <td>{{ $comment->created_at->format('d M Y, H:i') }}</td>
+                        <td>{{ $rating->user->name ?? 'Unknown User' }}</td>
+                        <td>{{ $rating->recipe->name ?? 'Unknown Recipe' }}</td>
                         <td>
-                            @if ($comment->isRead)
-                                <span style="color: #28a745; font-weight: bold;">Read</span>
-                            @else
-                                <span style="color: #dc3545; font-weight: bold;">Unread</span>
-                            @endif
+                            <span class="stars">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= $rating->rating)
+                                        <i class="fas fa-star"></i>
+                                    @else
+                                        <i class="far fa-star"></i>
+                                    @endif
+                                @endfor
+                            </span>
+                            ({{ $rating->rating }}/5)
                         </td>
+                        <td>{{ $rating->created_at->format('d M Y, H:i') }}</td>
                         <td>
-                            <button class="btn-view"
-                                onclick="viewComment('{{ addslashes($comment->comment_text) }}', '{{ $comment->user->name ?? 'Unknown' }}', '{{ $comment->recipe->name ?? 'Unknown' }}')">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                            <form action="{{ route('admin.comments.destroy', $comment->id) }}" method="POST"
-                                style="display: inline; margin-left: 5px;">
+                            <form action="{{ route('admin.ratings.destroy', $rating->id) }}" method="POST"
+                                style="display: inline;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-delete"
-                                    onclick="return confirm('Are you sure you want to delete this comment?')">
+                                    onclick="return confirm('Are you sure you want to delete this rating?')">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </form>
@@ -312,8 +339,8 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" style="text-align: center; color: #666; font-style: italic;">
-                            No comments found
+                        <td colspan="5" style="text-align: center; color: #666; font-style: italic;">
+                            No ratings found
                         </td>
                     </tr>
                 @endforelse
@@ -321,9 +348,9 @@
         </table>
 
         <!-- Pagination -->
-        @if (isset($comments) && $comments->hasPages())
+        @if (isset($ratings) && $ratings->hasPages())
             <div style="margin-top: 20px;">
-                {{ $comments->links() }}
+                {{ $ratings->links() }}
             </div>
         @endif
     </div>
@@ -334,10 +361,8 @@
             <img src="{{ url('../frontend/images/profile1.jpg') }}" alt="User Profile" class="rounded-circle"
                 width="40" height="40" />
             <div style="margin-left: 10px;">
-                <a href="/profil">
-                    <h5>Admin</h5>
-                </a>
-                <p>admin@gmail.com</p>
+                <h5>{{ Auth::user()->name ?? 'Admin' }}</h5>
+                <p>{{ Auth::user()->email ?? 'admin@example.com' }}</p>
             </div>
         </div>
         <form action="{{ route('logout') }}" method="POST" style="margin-top: 10px;">
@@ -365,18 +390,6 @@
                 popup.style.display = 'none';
             }
         };
-
-        // Fungsi untuk melihat komentar
-        function viewComment(commentText, userName, recipeName) {
-            alert(`Comment by ${userName} on ${recipeName}:\n\n${commentText}`);
-        }
-
-        // Fungsi untuk menghapus komentar
-        function deleteComment() {
-            if (confirm("Apakah Anda yakin ingin menghapus komentar ini?")) {
-                alert("Komentar berhasil dihapus!");
-            }
-        }
     </script>
 </body>
 

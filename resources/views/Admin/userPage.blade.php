@@ -1,12 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management</title>
-    <link rel="shortcut icon" type="x-icon" href="{{url('frontend/images/Logo.png')}}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet"/>
+    <link rel="shortcut icon" type="x-icon" href="{{ url('frontend/images/Logo.png') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* General Styles */
@@ -16,11 +17,13 @@
             box-sizing: border-box;
             font-family: 'Nunito', sans-serif;
         }
+
         body {
             display: flex;
             min-height: 100vh;
             background-color: #f5f5f5;
         }
+
         .sidebar {
             width: 250px;
             background-color: #603044;
@@ -30,23 +33,28 @@
             flex-direction: column;
             overflow: hidden;
         }
+
         .logo-container {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
+
         .logo-container img {
             width: 40px;
             height: 40px;
             margin-right: 8px;
         }
+
         .sidebar h1 {
             font-size: 1.2em;
             color: white;
         }
+
         .sidebar h1 span {
             color: #F44708;
         }
+
         .sidebar a {
             text-decoration: none;
             color: white;
@@ -57,18 +65,23 @@
             align-items: center;
             transition: background-color 0.3s;
         }
+
         .sidebar a i {
             margin-right: 8px;
             font-size: 1.1em;
         }
-        .sidebar a.active, .sidebar a:hover {
+
+        .sidebar a.active,
+        .sidebar a:hover {
             background-color: #3d1626;
             border-radius: 5px;
         }
+
         .content {
             flex: 1;
             padding: 20px;
         }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -79,24 +92,30 @@
             margin-bottom: 20px;
             position: relative;
         }
+
         .header .menu {
             font-size: 1.5em;
             cursor: pointer;
         }
+
         .user-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .user-table th, .user-table td {
+
+        .user-table th,
+        .user-table td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
+
         .user-table th {
             background-color: #603044;
             color: white;
         }
+
         .btn-add-user {
             background-color: #F44708;
             color: white;
@@ -106,22 +125,28 @@
             cursor: pointer;
             margin-bottom: 20px;
         }
-        .btn-delete, .btn-edit {
+
+        .btn-delete,
+        .btn-edit {
             padding: 5px 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
+
         .btn-delete {
             background-color: #de302a;
             color: white;
         }
+
         .btn-edit {
             background-color: #53da67;
             color: white;
         }
+
         /* Modal Styling */
-        #addUserModal, #editUserModal {
+        #addUserModal,
+        #editUserModal {
             display: none;
             position: fixed;
             top: 50%;
@@ -134,26 +159,34 @@
             padding: 20px;
             z-index: 1000;
         }
-        #addUserModal h3, #editUserModal h3 {
+
+        #addUserModal h3,
+        #editUserModal h3 {
             font-size: 1.5em;
             color: #603044;
             margin-bottom: 15px;
             text-align: center;
         }
-        #addUserModal input, #editUserModal input {
+
+        #addUserModal input,
+        #editUserModal input {
             width: 100%;
             padding: 10px;
             margin: 8px 0;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
-        #addUserModal label, #editUserModal label {
+
+        #addUserModal label,
+        #editUserModal label {
             display: block;
             margin-top: 10px;
             font-weight: bold;
             color: #333;
         }
-        #addUserModal button, #editUserModal button {
+
+        #addUserModal button,
+        #editUserModal button {
             width: 100%;
             padding: 10px;
             margin-top: 15px;
@@ -163,16 +196,21 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-        #addUserModal button[type="submit"], #editUserModal button[type="submit"] {
+
+        #addUserModal button[type="submit"],
+        #editUserModal button[type="submit"] {
             background-color: #53da67;
             color: white;
             font-weight: bold;
         }
-        #addUserModal button[type="button"], #editUserModal button[type="button"] {
+
+        #addUserModal button[type="button"],
+        #editUserModal button[type="button"] {
             background-color: #de302a;
             color: white;
             font-weight: bold;
         }
+
         /* Modal Background Overlay */
         .modal-overlay {
             position: fixed;
@@ -185,6 +223,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -195,8 +234,9 @@
         <a href="/admin"><i class="fas fa-home"></i>Dashboard</a>
         <a class="active" href="admin/user"><i class="fas fa-user"></i>User</a>
         {{-- <a href="/admin/resep"><i class="fas fa-book"></i>Resep</a> --}}
-        <a href="{{route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
-        <a href="{{route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
+        <a href="{{ route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
+        <a href="{{ route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
+        <a href="{{ route('admin.ratings.index') }}"><i class="fas fa-star"></i>Ratings</a>
         <a href="/admin/komentar"><i class="fas fa-comments"></i>Komentar</a>
 
     </div>
@@ -228,20 +268,23 @@
             </thead>
             <tbody>
                 @foreach ($users as $user)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->nomor_telepon }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>
-                        <button class="btn-edit" onclick="openEditUserModal('{{ $user->id }}', '{{ $user->name }}', '{{ $user->nomor_telepon }}', '{{ $user->email }}')">Edit</button>
-                        <form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete" onclick="return confirm('Apakah Anda yakin ingin menghapus user ini?')">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->nomor_telepon }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>
+                            <button class="btn-edit"
+                                onclick="openEditUserModal('{{ $user->id }}', '{{ $user->name }}', '{{ $user->nomor_telepon }}', '{{ $user->email }}')">Edit</button>
+                            <form action="{{ route('user.destroy', $user->id) }}" method="POST"
+                                style="display: inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-delete"
+                                    onclick="return confirm('Apakah Anda yakin ingin menghapus user ini?')">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -314,4 +357,5 @@
         }
     </script>
 </body>
+
 </html>

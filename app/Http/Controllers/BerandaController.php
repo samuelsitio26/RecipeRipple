@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Recipe;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class HomeController extends Controller
+class BerandaController extends Controller
 {
     public function index()
     {
@@ -23,11 +24,11 @@ class HomeController extends Controller
                 ->orderByDesc('comments_count')
                 ->orderByDesc('views_count')
                 ->orderByDesc('ratings_avg_rating')
-                ->limit(8)
+                ->limit(4)
                 ->get();
 
-            // Jika masih kurang dari 8, tambah dengan yang rating >= 3
-            if ($popularRecipes->count() < 8) {
+            // Jika masih kurang dari 4, tambah dengan yang rating >= 3
+            if ($popularRecipes->count() < 4) {
                 $additionalRecipes = Recipe::with(['kategori', 'user'])
                     ->withCount('comments')
                     ->withAvg('ratings', 'rating')
@@ -36,7 +37,7 @@ class HomeController extends Controller
                     ->orderByDesc('comments_count')
                     ->orderByDesc('views_count')
                     ->orderByDesc('ratings_avg_rating')
-                    ->limit(8 - $popularRecipes->count())
+                    ->limit(4 - $popularRecipes->count())
                     ->get();
 
                 $popularRecipes = $popularRecipes->merge($additionalRecipes);
@@ -50,11 +51,11 @@ class HomeController extends Controller
                 ->orderByDesc('comments_count')
                 ->orderByDesc('views_count')
                 ->orderByDesc('ratings_avg_rating')
-                ->limit(8)
+                ->limit(4)
                 ->get();
 
-            // Jika kurang dari 8, tambah dengan resep terpopuler lainnya
-            if ($popularRecipes->count() < 8) {
+            // Jika kurang dari 4, tambah dengan resep terpopuler lainnya
+            if ($popularRecipes->count() < 4) {
                 $additionalRecipes = Recipe::with(['kategori', 'user'])
                     ->withCount('comments')
                     ->withAvg('ratings', 'rating')
@@ -62,7 +63,7 @@ class HomeController extends Controller
                     ->orderByDesc('comments_count')
                     ->orderByDesc('views_count')
                     ->orderByDesc('created_at')
-                    ->limit(8 - $popularRecipes->count())
+                    ->limit(4 - $popularRecipes->count())
                     ->get();
 
                 $popularRecipes = $popularRecipes->merge($additionalRecipes);
@@ -75,11 +76,11 @@ class HomeController extends Controller
                 ->orderByDesc('comments_count')
                 ->orderByDesc('views_count')
                 ->orderByDesc('created_at')
-                ->limit(8)
+                ->limit(4)
                 ->get();
         }
 
-        // Ambil 3 kategori teratas untuk ditampilkan
+        // Ambil kategori untuk bagian "Telusuri Berdasarkan" dengan statistik
         $categories = Kategori::withCount(['recipes as recipe_count'])
             ->limit(3)
             ->get()
@@ -96,6 +97,6 @@ class HomeController extends Controller
                 return $category;
             });
 
-        return view('HomePage', compact('popularRecipes', 'categories'));
+        return view('berandaPage', compact('popularRecipes', 'categories'));
     }
 }

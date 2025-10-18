@@ -104,4 +104,38 @@ class CommentController extends Controller
             return response()->json(['error' => 'Failed to load unread comments.'], 500);
         }
     }
+
+    // Admin index untuk menampilkan semua komentar
+    public function adminIndex()
+    {
+        try {
+            $comments = Comment::with(['user', 'recipe'])
+                ->latest()
+                ->paginate(15);
+
+            // Calculate statistics
+            $totalComments = Comment::count();
+            $recentComments = Comment::where('created_at', '>=', now()->subDays(7))->count();
+            $unreadComments = Comment::where('isRead', false)->count();
+
+            return view('Admin.komentarPage', compact('comments', 'totalComments', 'recentComments', 'unreadComments'));
+        } catch (\Exception $e) {
+            Log::error('Error in admin comment index: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan.');
+        }
+    }
+
+    // Admin delete comment
+    public function adminDestroy($id)
+    {
+        try {
+            $comment = Comment::findOrFail($id);
+            $comment->delete();
+
+            return redirect()->back()->with('success', 'Komentar berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Error deleting comment by admin: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus komentar.');
+        }
+    }
 }

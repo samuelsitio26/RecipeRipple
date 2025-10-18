@@ -474,13 +474,40 @@
             background-color: #f0f0f0;
             /* Warna latar belakang saat hover */
         }
+
+        .comment-menu {
+            position: relative;
+        }
+
+        .comment-header {
+            margin-bottom: 0.5rem;
+        }
+
+        .authorName {
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .time {
+            color: #888;
+            font-size: 0.8rem;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .comment {
+            background-color: #FFFFFF;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg">
         <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center" href="#">
+        <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="{{ url('frontend/images/logo.png') }}" alt="Recipe Ripple" width="30" class="me-2"
                 style="border-radius: 50%;">
             Recipe <span style="color: #F44708;">Ripple</span>
@@ -493,67 +520,76 @@
         </button>
 
         <!-- Navigation Links -->
-
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                @auth
+                    <li class="nav-item">
+                        <a class="nav-link" href="/beranda"
+                            style="display: flex; flex-direction: column; align-items: center;">
+                            <i class="fas fa-home"></i>
+                            Beranda
+                        </a>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"
+                            style="display: flex; flex-direction: column; align-items: center;">
+                            <i class="fas fa-home"></i>
+                            Home
+                        </a>
+                    </li>
+                @endauth
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin"
-                        style="display: flex; flex-direction: column; align-items: center;">
-                        <i class="fas fa-home"></i>
-                        Beranda
-                    </a>
+                    <button type="button" class="nav-link active" onclick="history.back()"
+                        style="display: flex; flex-direction: column; align-items: center; color:#F44708; padding-right: 50px; background: none; border: none;">
+                        <i class="fas fa-arrow-left"></i>
+                        Kembali
+                    </button>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="/resep"
-                        style="display: flex; flex-direction: column; align-items: center; color:#F44708; padding-right: 50px;"">
-                        <i class="fas fa-book"></i>
-                        Resep
-                    </a>
-                </li>
-                {{-- <li class="nav-item">
-                    <a class="nav-link" href="/writeresep" style="display: flex; flex-direction: column; align-items: center;">
-                        <i class="fas fa-pen"></i>
-                        Tulis
-                    </a>
-                </li> --}}
-                {{-- <li class="nav-item">
-                    <a class="nav-link" href="/notifikasi" style="display: flex; flex-direction: column; align-items: center;">
-                        <i class="fas fa-bell"></i>
-                        @if ($counts > 0)
-                        Notifikasi ({{ $counts }})
-                        @elseif($counts == 0)
-                        Notifikasi
-                        @endif
-                    </a>
-                </li> --}}
-                <li class="nav-item">
-                    {{-- <div class="nav-link profile" onclick="toggleProfilePopup()">
-                        <img alt="Profile Picture" src="{{ url('../frontend/images/profile1.jpg') }}" width="40"
-                            height="40" />
-                        <span>Admin</span>
-                    </div> --}}
-                    <!-- Profile Popup for Logout -->
-                    <div class="profile-popup" id="profilePopup">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ url('../frontend/images/profile1.jpg') }}" alt="User Profile"
-                                class="rounded-circle" width="40" height="40" />
-                            <div style="margin-left: 10px;">
-                                <a href="/profil">
-                                    <h5>Admin</h5>
-                                </a>
-                                <p>admin@gmail.com</p>
-                            </div>
-                        </div>
-                        <form action="{{ route('logout') }}" method="POST" style="margin-top: 10px;">
-                            @csrf
-                            <button type="submit">Keluar</button>
-                        </form>
-                    </div>
-
-                </li>
+                @auth
+                    <!-- Profile Link -->
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="#" onclick="toggleProfilePopup()">
+                            <img src="{{ url('frontend/images/profile1.jpg') }}" alt="User Profile"
+                                class="rounded-circle me-2" width="30" height="30" />
+                            <span>Profil</span>
+                        </a>
+                    </li>
+                @else
+                    <!-- Login Button for Guest -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login"
+                            style="display: flex; flex-direction: column; align-items: center; background-color: #F44708; color: white; padding: 0.5rem 1rem; border-radius: 5px; margin-left: 10px;">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </a>
+                    </li>
+                @endauth
             </ul>
         </div>
     </nav>
+
+    <!-- Profile Popup - Only for authenticated users -->
+    @auth
+        <div class="profile-popup" id="profilePopup">
+            <div class="d-flex align-items-center">
+                <img src="{{ url('frontend/images/profile1.jpg') }}" alt="User Profile" class="rounded-circle" />
+                <div>
+                    <a href="/profil">
+                        <strong>{{ Auth::user()->name ?? 'User' }}</strong><br>
+                    </a>
+                    <small>{{ Auth::user()->email ?? 'user@example.com' }}</small>
+                </div>
+            </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    style="width: 100%; background-color: #f44708; color: white; border: none; border-radius: 5px; padding: 0.5rem; cursor: pointer;">
+                    Keluar
+                </button>
+            </form>
+        </div>
+    @endauth
 
     <div class="container">
         <div class="video-placeholder">
@@ -576,15 +612,40 @@
         </div>
 
 
+        <!-- Rating Section -->
         <div class="rating-container" style="margin: 1rem 0;">
-            <p class="section-title" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Beri Rating</p>
-            <div class="star-rating">
-                <i class="fas fa-star" data-rating="1"></i>
-                <i class="fas fa-star" data-rating="2"></i>
-                <i class="fas fa-star" data-rating="3"></i>
-                <i class="fas fa-star" data-rating="4"></i>
-                <i class="fas fa-star" data-rating="5"></i>
-            </div>
+            @auth
+                <!-- User Rating Form -->
+                <div class="user-rating" style="margin-bottom: 1rem;">
+                    <p class="section-title"
+                        style="font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        Beri Rating
+                        <span style="font-size: 1rem; color: #666; font-weight: normal;">
+                            ({{ number_format($recipe->average_rating, 1) }})
+                        </span>
+                    </p>
+                    <div class="star-rating" style="display: flex; gap: 5px;">
+                        <i class="fas fa-star rating-star" data-rating="1"
+                            style="font-size: 1.5rem; color: #ccc; cursor: pointer;"></i>
+                        <i class="fas fa-star rating-star" data-rating="2"
+                            style="font-size: 1.5rem; color: #ccc; cursor: pointer;"></i>
+                        <i class="fas fa-star rating-star" data-rating="3"
+                            style="font-size: 1.5rem; color: #ccc; cursor: pointer;"></i>
+                        <i class="fas fa-star rating-star" data-rating="4"
+                            style="font-size: 1.5rem; color: #ccc; cursor: pointer;"></i>
+                        <i class="fas fa-star rating-star" data-rating="5"
+                            style="font-size: 1.5rem; color: #ccc; cursor: pointer;"></i>
+                    </div>
+                </div>
+            @else
+                <!-- Guest Rating Message -->
+                <div class="guest-rating" style="margin-bottom: 1rem;">
+                    <p style="color: #666; font-style: italic;">
+                        <a href="{{ route('login') }}" style="color: #FF4500;">Login</a> untuk memberikan rating
+                    </p>
+                </div>
+            @endauth
+
         </div>
 
         <div class="title-container" style="margin-bottom: 10px;">
@@ -664,17 +725,48 @@
 
     <div class="comment-section">
         <h2>Komentar</h2>
-        <div class="comment-form">
-            <img src="{{ 'frontend/images/profile1.jpg' }}" alt="Foto Profil">
-            <textarea id="commentInput" placeholder="Beri komentar"></textarea>
-            <button class="submit-button" onclick="addComment()">
-                <i class="fa fa-paper-plane"></i>
-            </button>
-        </div>
+        @auth
+            <div class="comment-form">
+                <img src="{{ url('frontend/images/profile1.jpg') }}" alt="Foto Profil">
+                <textarea id="commentInput" placeholder="Beri komentar"></textarea>
+                <button class="submit-button" onclick="addComment()">
+                    <i class="fa fa-paper-plane"></i>
+                </button>
+            </div>
+        @else
+            <div style="text-align: center; padding: 1rem; color: #666;">
+                <p><a href="{{ route('login') }}" style="color: #FF4500;">Login</a> untuk memberikan komentar</p>
+            </div>
+        @endauth
     </div>
     <div class="recipe-author">
         <div id="commentsContainer">
-
+            @foreach ($comments as $comment)
+                <div class="comment">
+                    <div class="author-info">
+                        <div class="comment-header"
+                            style="display: flex; justify-content: space-between; align-items: center;">
+                            <p class="authorName">{{ $comment->user->name }}</p>
+                            @if (Auth::check() && Auth::id() == $comment->user_id)
+                                <div class="comment-menu" style="position: relative;">
+                                    <i class="fas fa-ellipsis-v" style="cursor: pointer; padding: 5px;"
+                                        onclick="toggleCommentMenu({{ $comment->id }})"></i>
+                                    <div class="context-menu" id="menu-{{ $comment->id }}"
+                                        style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; border-radius: 5px; padding: 5px; min-width: 100px; z-index: 1000;">
+                                        <button
+                                            onclick="editComment({{ $comment->id }}, '{{ addslashes($comment->comment_text) }}')"
+                                            style="width: 100%; text-align: left; border: none; background: none; padding: 5px;">Edit</button>
+                                        <button onclick="deleteComment({{ $comment->id }})"
+                                            style="width: 100%; text-align: left; border: none; background: none; padding: 5px; color: red;">Hapus</button>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <p id="comment-text-{{ $comment->id }}">{{ $comment->comment_text }}</p>
+                        <p class="time">{{ $comment->created_at->format('d M Y H:i') }}</p>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 
@@ -709,19 +801,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function toggleProfilePopup() {
-            console.log("Profile clicked!"); // Debug log
-            const popup = document.getElementById("profilePopup");
-            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+            var popup = document.getElementById('profilePopup');
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
         }
 
-        // Close profile popup when clicking outside
+        // Close popup when clicking outside
         window.onclick = function(event) {
-            const popup = document.getElementById('profilePopup');
-            console.log("Clicked element:", event.target);
-            if (!event.target.closest('.profile') && !event.target.closest('#profilePopup')) {
-                popup.style.display = 'none'; // Hide popup
+            var popup = document.getElementById('profilePopup');
+            if (!event.target.matches('.nav-link') && !event.target.closest('.profile-popup')) {
+                if (popup.style.display === 'block') {
+                    popup.style.display = 'none';
+                }
             }
-        };
+        }
 
 
         function logout() {
@@ -738,7 +830,8 @@
                 // Mengirim komentar ke server menggunakan Axios
                 axios.post('/comments/add', {
                         comment_text: commentText,
-                        user_id: 1 // Ganti dengan ID user yang login
+                        recipe_id: {{ $recipe->id }},
+                        _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     })
                     .then(response => {
                         const commentData = response.data.comment;
@@ -753,10 +846,18 @@
                         commentDiv.className = 'comment';
                         commentDiv.innerHTML = `
                 <div class="author-info">
-                    <p class="authorName">${authorName}</p>
-                    <p>${commentData.comment_text}</p>
+                    <div class="comment-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <p class="authorName">${authorName}</p>
+                        <div class="comment-menu">
+                            <i class="fas fa-ellipsis-v" style="cursor: pointer; padding: 5px;" onclick="toggleCommentMenu(${commentId})"></i>
+                            <div class="context-menu" id="menu-${commentId}" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ccc; border-radius: 5px; padding: 5px; min-width: 100px; z-index: 1000;">
+                                <button onclick="editComment(${commentId}, '${commentData.comment_text}')" style="width: 100%; text-align: left; border: none; background: none; padding: 5px;">Edit</button>
+                                <button onclick="deleteComment(${commentId})" style="width: 100%; text-align: left; border: none; background: none; padding: 5px; color: red;">Hapus</button>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="comment-text-${commentId}">${commentData.comment_text}</p>
                     <p class="time">${new Date(commentData.created_at).toLocaleString()}</p>
-                    <i class="fa fa-trash delete-icon" title="Hapus Komentar"></i>
                 </div>
             `;
 
@@ -766,51 +867,127 @@
                         // Kosongkan input setelah komentar ditambahkan
                         commentInput.value = "";
 
-                        // Tambahkan event listener untuk menghapus komentar
-                        const deleteIcon = commentDiv.querySelector('.delete-icon');
-                        deleteIcon.addEventListener('click', function() {
-                            deleteComment(commentId, commentDiv);
-                        });
-
                     })
                     .catch(error => {
                         console.error('Terjadi kesalahan:', error.response ? error.response.data : error.message);
-                        alert('Gagal menambahkan komentar.');
+                        alert('Gagal menambahkan komentar. ' + (error.response?.data?.message || 'Silakan coba lagi.'));
                     });
             } else {
                 alert("Komentar tidak boleh kosong!");
             }
         }
 
-        // Fungsi untuk menghapus komentar
-        function deleteComment(button) {
-            const commentId = button.getAttribute('data-comment-id'); // Ambil ID komentar dari atribut data
+        // Fungsi untuk toggle menu komentar
+        function toggleCommentMenu(commentId) {
+            const menu = document.getElementById(`menu-${commentId}`);
+            // Tutup semua menu lainnya
+            document.querySelectorAll('.context-menu').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
+            // Toggle menu yang diklik
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
 
-            // Kirim request DELETE
-            fetch(`/comment/${commentId}`, {
-                    method: 'DELETE',
+        // Tutup menu ketika klik di luar
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.comment-menu')) {
+                document.querySelectorAll('.context-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
+
+        // Fungsi untuk edit komentar
+        function editComment(commentId, currentText) {
+            const textElement = document.getElementById(`comment-text-${commentId}`);
+            const originalText = currentText;
+
+            // Ganti teks dengan input field
+            textElement.innerHTML = `
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="edit-input-${commentId}" value="${originalText}" style="flex: 1; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                    <button onclick="saveEdit(${commentId}, '${originalText}')" style="background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Simpan</button>
+                    <button onclick="cancelEdit(${commentId}, '${originalText}')" style="background: #6c757d; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Batal</button>
+                </div>
+            `;
+
+            // Tutup menu
+            document.getElementById(`menu-${commentId}`).style.display = 'none';
+        }
+
+        // Fungsi untuk menyimpan edit
+        function saveEdit(commentId, originalText) {
+            const input = document.getElementById(`edit-input-${commentId}`);
+            const newText = input.value.trim();
+
+            if (newText === '') {
+                alert('Komentar tidak boleh kosong!');
+                return;
+            }
+
+            // Kirim request update ke server
+            fetch(`/comment/${commentId}/update`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content') // Token CSRF
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
+                    body: JSON.stringify({
+                        comment_text: newText
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Pastikan elemen yang ingin dihapus masih ada
-                        const commentElement = button.closest('.comment');
-                        if (commentElement) {
-                            // Jika masih ada, hapus elemen tersebut dari DOM
-                            commentElement.remove();
-                        }
-
-                        // Refresh halaman untuk mendapatkan data terbaru
-                        location.reload();
+                        // Update tampilan dengan teks baru
+                        document.getElementById(`comment-text-${commentId}`).textContent = newText;
                     } else {
-                        alert(data.message); // Jika gagal, tampilkan pesan
+                        alert('Gagal mengupdate komentar: ' + (data.message || 'Unknown error'));
+                        // Kembalikan ke teks asli
+                        document.getElementById(`comment-text-${commentId}`).textContent = originalText;
                     }
                 })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengupdate komentar');
+                    // Kembalikan ke teks asli
+                    document.getElementById(`comment-text-${commentId}`).textContent = originalText;
+                });
+        }
+
+        // Fungsi untuk membatalkan edit
+        function cancelEdit(commentId, originalText) {
+            document.getElementById(`comment-text-${commentId}`).textContent = originalText;
+        }
+
+        // Fungsi untuk menghapus komentar
+        function deleteComment(commentId) {
+            if (confirm('Apakah Anda yakin ingin menghapus komentar ini?')) {
+                // Kirim request DELETE
+                fetch(`/comment/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Hapus elemen dari DOM
+                            const commentElement = document.querySelector(`#menu-${commentId}`).closest('.comment');
+                            if (commentElement) {
+                                commentElement.remove();
+                            }
+                        } else {
+                            alert('Gagal menghapus komentar: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat menghapus komentar');
+                    });
+            }
         }
 
 
@@ -824,30 +1001,89 @@
         // }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const stars = document.querySelectorAll('.star-rating i');
-            let currentRating = 0;
+            const ratingStars = document.querySelectorAll('.rating-star');
+            let selectedRating = 0;
 
-            stars.forEach(star => {
+            // Handle rating star interactions
+            ratingStars.forEach(star => {
                 star.addEventListener('click', function() {
-                    currentRating = parseInt(this.getAttribute('data-rating'));
-                    stars.forEach((s, index) => {
-                        s.classList.toggle('selected', index < currentRating);
-                    });
+                    selectedRating = parseInt(this.getAttribute('data-rating'));
+                    updateStarDisplay(selectedRating);
+                    submitRating(selectedRating);
                 });
 
                 star.addEventListener('mouseover', function() {
                     const hoverRating = parseInt(this.getAttribute('data-rating'));
-                    stars.forEach((s, index) => {
-                        s.classList.toggle('selected', index < hoverRating);
-                    });
+                    updateStarDisplay(hoverRating);
                 });
 
                 star.addEventListener('mouseout', function() {
-                    stars.forEach((s, index) => {
-                        s.classList.toggle('selected', index < currentRating);
-                    });
+                    updateStarDisplay(selectedRating);
                 });
             });
+
+            function updateStarDisplay(rating) {
+                ratingStars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.style.color = '#FFD700';
+                    } else {
+                        star.style.color = '#ccc';
+                    }
+                });
+            }
+
+            function submitRating(rating) {
+                const formData = new FormData();
+                formData.append('rating', rating);
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute(
+                    'content'));
+
+                // Disable star interactions temporarily
+                ratingStars.forEach(star => {
+                    star.style.pointerEvents = 'none';
+                    star.style.opacity = '0.6';
+                });
+
+                fetch(`/recipe/{{ $recipe->id }}/rating`, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload(); // Refresh to show new rating
+                        } else {
+                            alert('Gagal menyimpan rating: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim rating');
+                    })
+                    .finally(() => {
+                        // Re-enable star interactions
+                        ratingStars.forEach(star => {
+                            star.style.pointerEvents = 'auto';
+                            star.style.opacity = '1';
+                        });
+                    });
+            }
+
+            // Load user's existing rating
+            @auth
+            fetch(`/recipe/{{ $recipe->id }}/rating/user`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.rating) {
+                        selectedRating = data.rating;
+                        updateStarDisplay(selectedRating);
+                    }
+                })
+                .catch(error => console.log('No existing rating found'));
+        @endauth
         });
     </script>
 </body>

@@ -198,11 +198,12 @@
             <img alt="Logo" src="{{ url('../frontend/images/Logo.png') }}" />
             <h1>Recipe <span>Ripple</span></h1>
         </div>
-        <a class="active" href="/admin"><i class="fas fa-home"></i>Dashboard</a>
+        <a href="/admin"><i class="fas fa-home"></i>Dashboard</a>
         <a href="admin/user"><i class="fas fa-user"></i>User</a>
         {{-- <a href="/admin/resep"><i class="fas fa-book"></i>Resep</a> --}}
-        <a href="{{route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
-        <a href="{{route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
+        <a href="{{ route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
+        <a href="{{ route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
+        <a href="{{ route('admin.ratings.index') }}"><i class="fas fa-star"></i>Ratings</a>
         <a href="/admin/komentar"><i class="fas fa-comments"></i>Komentar</a>
     </div>
 
@@ -218,6 +219,32 @@
         </div>
         <div class="dashboard">
             <h2>Dashboard</h2>
+
+            <!-- Statistics Summary -->
+            <div class="stats-summary"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card"
+                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <h3 style="margin: 0; font-size: 2rem;">{{ $totalUsers }}</h3>
+                    <p style="margin: 0.5rem 0 0 0;">Total Users</p>
+                </div>
+                <div class="stat-card"
+                    style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <h3 style="margin: 0; font-size: 2rem;">{{ $totalRecipes }}</h3>
+                    <p style="margin: 0.5rem 0 0 0;">Total Resep</p>
+                </div>
+                <div class="stat-card"
+                    style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <h3 style="margin: 0; font-size: 2rem;">{{ $totalRatings }}</h3>
+                    <p style="margin: 0.5rem 0 0 0;">Total Ratings</p>
+                </div>
+                <div class="stat-card"
+                    style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <h3 style="margin: 0; font-size: 2rem;">{{ $averageRating ?? 0 }}/5</h3>
+                    <p style="margin: 0.5rem 0 0 0;">Rata-rata Rating</p>
+                </div>
+            </div>
+
             <div class="cards">
                 <div class="card">
                     <h3>User Registration</h3>
@@ -228,9 +255,10 @@
                     <canvas id="recipeChart"></canvas>
                 </div>
                 <div class="card">
-                    <h3>Jumlah Komentar</h3>
-                    <canvas id="commentChart"></canvas>
+                    <h3>Jumlah Rating</h3>
+                    <canvas id="ratingChart"></canvas>
                 </div>
+            </div>
             </div>
         </div>
     </div>
@@ -280,6 +308,7 @@
         // Ambil data dari PHP ke JavaScript
         const userData = @json($userData);
         const recipeData = @json($recipeData);
+        const ratingData = @json($ratingData);
 
         const userCtx = document.getElementById('userChart').getContext('2d');
         const userChart = new Chart(userCtx, {
@@ -291,11 +320,25 @@
                     data: userData,
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     tension: 0.1
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Registrasi User per Bulan'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
-
 
         const recipeCtx = document.getElementById('recipeChart').getContext('2d');
         const recipeChart = new Chart(recipeCtx, {
@@ -304,26 +347,55 @@
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
                     label: 'Jumlah Resep',
-                    data: Object.values(recipeData),
+                    data: recipeData,
                     fill: false,
                     borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     tension: 0.1
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Resep Ditambahkan per Bulan'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
 
-        const commentCtx = document.getElementById('commentChart').getContext('2d');
-        const commentChart = new Chart(commentCtx, {
-            type: 'line',
+        const ratingCtx = document.getElementById('ratingChart').getContext('2d');
+        const ratingChart = new Chart(ratingCtx, {
+            type: 'bar',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
-                    label: 'Jumlah Komentar',
-                    data: [5, 15, 10, 5, 20, 30],
-                    fill: false,
+                    label: 'Jumlah Rating',
+                    data: ratingData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     borderColor: 'rgb(54, 162, 235)',
-                    tension: 0.1
+                    borderWidth: 1
                 }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Rating Diberikan per Bulan'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
         });
     </script>

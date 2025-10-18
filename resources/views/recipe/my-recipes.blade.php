@@ -428,32 +428,48 @@
                     </a>
                 </li>
                 <!-- Profile Link -->
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center" href="#" onclick="toggleProfilePopup()">
-                        <img src="{{ url('frontend/images/profile1.jpg') }}" alt="User Profile"
-                            class="rounded-circle me-2" width="30" height="30" />
-                        <span>Profil</span>
-                    </a>
-                </li>
+                @auth
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="#" onclick="toggleProfilePopup()">
+                            <img src="{{ url('frontend/images/profile1.jpg') }}" alt="User Profile"
+                                class="rounded-circle me-2" width="30" height="30" />
+                            <span>{{ Auth::user()->name }}</span>
+                        </a>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login"
+                            style="display: flex; flex-direction: column; align-items: center;">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </a>
+                    </li>
+                @endauth
             </ul>
         </div>
     </nav>
 
     <!-- Profile Popup -->
-    <div class="profile-popup" id="profilePopup">
-        <div class="d-flex align-items-center mb-2">
-            <img src="{{ url('frontend/images/profile1.jpg') }}" alt="User Profile" />
-            <div>
-                <h5>{{ Auth::user()->name ?? 'User' }}</h5>
-                <p>{{ Auth::user()->email ?? 'user@example.com' }}</p>
+    @auth
+        <div class="profile-popup" id="profilePopup">
+            <div class="d-flex align-items-center">
+                <img src="{{ url('frontend/images/profile1.jpg') }}" alt="User Profile" class="rounded-circle" />
+                <div>
+                    <a href="/profil">
+                        <strong>{{ Auth::user()->name }}</strong><br>
+                    </a>
+                    <small>{{ Auth::user()->email }}</small>
+                </div>
             </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    style="width: 100%; background-color: #f44708; color: white; border: none; border-radius: 5px; padding: 0.5rem; cursor: pointer;">
+                    Keluar
+                </button>
+            </form>
         </div>
-        <button onclick="window.location.href='/profil'">Profil</button>
-        <form action="/logout" method="POST">
-            @csrf
-            <button type="submit">Logout</button>
-        </form>
-    </div>
+    @endauth
 
     <div class="container">
         <div class="page-header">

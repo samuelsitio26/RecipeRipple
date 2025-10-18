@@ -47,7 +47,7 @@ class Resep extends Controller
             $recipes = Recipe::all();
 
             // Ambil semua komentar dengan data user terkait
-            $comments = Comment::with('user')->get();
+            $comments = Comment::with('user')->get(); 
 
             // Hitung jumlah komentar yang belum dibaca
             $unreadCount = Comment::where('isRead', 0)->count();
@@ -148,10 +148,51 @@ class Resep extends Controller
 
     }
 
-    public function show_all() {
-        $data['resep'] = DB::table('recipes')->get()->toArray();
+    public function show_all(Request $request)
+    {
+        try {
+            $query = Recipe::with(['kategori', 'user']);
 
-        return view('searchresepPage', compact('data'));
+            // Filter by category
+            if ($request->has('kategori') && $request->kategori != '') {
+                $query->where('kategori_id', $request->kategori);
+            }
+
+            // Search
+            if ($request->has('search') && $request->search != '') {
+                $query->where(function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('description', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            // Sort
+            $sortBy = $request->get('sort', 'latest');
+            switch ($sortBy) {
+                case 'popular':
+                    $query->orderBy('average_rating', 'desc')
+                        ->orderBy('total_ratings', 'desc');
+                    break;
+                case 'most_viewed':
+                    $query->orderBy('views_count', 'desc');
+                    break;
+                case 'oldest':
+                    $query->oldest();
+                    break;
+                default:
+                    $query->latest();
+            }
+
+            $recipes = $query->paginate(12);
+
+            // Get categories for filter
+            $categories = \App\Models\Kategori::all();
+
+            return view('resepListPage', compact('recipes', 'categories'));
+        } catch (\Exception $e) {
+            Log::error('Error loading recipes: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Failed to load recipes.']);
+        }
     }
 
 }

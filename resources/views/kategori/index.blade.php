@@ -253,6 +253,7 @@
         {{-- <a href="/admin/resep"><i class="fas fa-book"></i>Resep</a> --}}
         <a href="{{ route('recipe.index') }}"><i class="fas fa-book"></i>Tambah recipe</a>
         <a class="active" href="{{ route('kategori.index') }}"><i class="fas fa-book"></i>Tambah Kategori</a>
+        <a href="{{ route('admin.ratings.index') }}"><i class="fas fa-star"></i>Ratings</a>
         <a href="/admin/komentar"><i class="fas fa-comments"></i>Komentar</a>
     </div>
 

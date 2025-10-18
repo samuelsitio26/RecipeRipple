@@ -117,4 +117,40 @@ class RatingController extends Controller
             return response()->json(['success' => false], 500);
         }
     }
+
+    public function adminIndex()
+    {
+        try {
+            $ratings = Rating::with(['recipe', 'user'])
+                ->latest()
+                ->paginate(15);
+
+            // Calculate statistics
+            $totalRatings = Rating::count();
+            $averageRating = Rating::avg('rating');
+            $topRatedRecipes = Recipe::where('average_rating', '>=', 4)->count();
+
+            return view('Admin.ratings', compact('ratings', 'totalRatings', 'averageRating', 'topRatedRecipes'));
+        } catch (\Exception $e) {
+            Log::error('Error in admin rating index: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan.');
+        }
+    }
+
+    public function getRecipeRatings($recipeId)
+    {
+        try {
+            $recipe = Recipe::findOrFail($recipeId);
+            $ratings = $recipe->ratings()->with('user')->latest()->paginate(10);
+
+            return response()->json([
+                'success' => true,
+                'ratings' => $ratings,
+                'average_rating' => $recipe->average_rating,
+                'total_ratings' => $recipe->total_ratings
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false], 500);
+        }
+    }
 }

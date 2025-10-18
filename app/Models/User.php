@@ -13,14 +13,15 @@ class User extends Authenticatable
 
     // Atribut yang dapat diisi secara massal
     protected $fillable = [
-        'name', 
-        'email', 
+        'name',
+        'email',
         'nomor_telepon',
-        'password',  
+        'password',
         'profile_image', // Kolom tambahan jika ada
         'google_id',
         'google_token',
-        'google_refresh_token'
+        'google_refresh_token',
+        'role'
     ];
 
     protected $hidden = [
@@ -33,6 +34,6 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    
-    
+
+
 }

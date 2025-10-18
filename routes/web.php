@@ -1,11 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\homeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\loginController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\signupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Resep;
@@ -65,22 +68,14 @@ Route::get('/admin', [AdminController::class, 'index'])
 Route::get('/user', [UserController::class, 'index'])
     ->middleware(['auth', 'role:user']); // Hanya bisa diakses oleh user
 
-Route::get('/', function () {
-    return view('HomePage');
-});
-
-Route::get('/beranda', function () {
-    return view('berandaPage');
-});
+Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
 
 
 // Route::get('/admin/resep', function () {
 //     return view('Admin/resepPage');
 // });
 
-Route::get('/admin/komentar', function () {
-    return view('Admin/komentarPage');
-});
+Route::get('/admin/komentar', [CommentController::class, 'adminIndex']);
 
 Route::get('/writeresep', function () {
     return view('writeResepPage');
@@ -119,14 +114,15 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+// Route komentar tetap perlu auth
 Route::middleware(['auth'])->group(function () {
-    Route::get('/resep/{id}', [RecipeController::class, 'show'])->name('resep.show');
     Route::post('/resep/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
 });
 // Route::match(['get', 'post'], '/resep/{id}', [RecipeController::class, 'show'])->name('recipe.show');
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::post('/comments/add', [RecipeController::class, 'addComment']);
-Route::delete('/comment/{id}', [RecipeController::class, 'destroy'])->name('comment.destroy');
+Route::delete('/comment/{id}', [RecipeController::class, 'destroyComment'])->name('comment.destroy');
+Route::put('/comment/{id}/update', [RecipeController::class, 'updateComment'])->name('comment.update');
 
 Route::post('/comments/read/{id}', [NotificationController::class, 'read'])->name('comments.read');
 Route::get('/comments/readed', [NotificationController::class, 'readed'])->name('comments.readed');
@@ -213,13 +209,33 @@ Route::get('/recipes/popular', [RecipeController::class, 'getPopular'])->name('r
 Route::get('/recipes/search', [RecipeController::class, 'search'])->name('recipe.search');
 
 // Admin Rating Management
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin/ratings', [RatingController::class, 'adminIndex'])->name('admin.ratings.index');
     Route::delete('/admin/ratings/{rating}', [RatingController::class, 'destroy'])->name('admin.ratings.destroy');
-});
 
-// Homepage dengan data dinamis
+    // Admin Comment Management
+    Route::get('/admin/comments', [CommentController::class, 'adminIndex'])->name('admin.comments.index');
+    Route::delete('/admin/comments/{comment}', [CommentController::class, 'adminDestroy'])->name('admin.comments.destroy');
+});// Homepage dengan data dinamis
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Test login routes
+Route::get('/test-login', function () {
+    return view('test-login');
+})->name('test.login');
+
+Route::post('/test-login', function (Request $request) {
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        return redirect()->route('test.login')->with('success', 'Login successful!');
+    }
+
+    return back()->withErrors(['email' => 'Invalid credentials']);
+})->name('test.login.submit');
 
 // Recipe routes dengan kategori dinamis
 Route::get('/recipe/category/{slug}', [RecipeController::class, 'getByCategory'])->name('recipe.by.category');

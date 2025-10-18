@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Recipe;
 use App\Models\Kategori;
+use App\Models\Comment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -34,7 +36,7 @@ class RecipeController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Recipe::with('kategori');
+            $query = Recipe::with(['kategori', 'user']);
 
             // Filter by category
             if ($request->has('kategori') && $request->kategori != '') {
@@ -227,10 +229,13 @@ class RecipeController extends Controller
         try {
             $recipe = Recipe::with([
                 'kategori',
+                'user',
                 'ratings' => function ($query) {
-                    $query->with('user')->latest()->limit(5);
+                    $query->with('user')->latest();
                 },
-                'comments'
+                'comments' => function ($query) {
+                    $query->with('user')->latest();
+                }
             ])->findOrFail($id);
 
             // Increment views
@@ -242,14 +247,22 @@ class RecipeController extends Controller
                 $userRating = $recipe->ratings()->where('user_id', Auth::id())->first();
             }
 
-            // Get related recipes
-            $relatedRecipes = Recipe::where('kategori_id', $recipe->kategori_id)
+            // Get related recipes with their ratings
+            $relatedRecipes = Recipe::with(['kategori', 'user'])
+                ->where('kategori_id', $recipe->kategori_id)
                 ->where('id', '!=', $recipe->id)
                 ->orderBy('average_rating', 'desc')
+                ->orderBy('total_ratings', 'desc')
                 ->limit(4)
                 ->get();
 
-            return view('recipe.show', compact('recipe', 'userRating', 'relatedRecipes'));
+            // Get comments for this recipe
+            $comments = $recipe->comments()->with('user')->latest()->get();
+
+            // Get categories from database (admin assigned categories)
+            $categories = Kategori::all();
+
+            return view('recipe.show', compact('recipe', 'userRating', 'relatedRecipes', 'comments', 'categories'));
         } catch (\Exception $e) {
             Log::error('Error showing recipe: ' . $e->getMessage());
             return redirect()->route('recipe.index')->with('error', 'Resep tidak ditemukan.');
@@ -618,6 +631,110 @@ class RecipeController extends Controller
         } catch (\Exception $e) {
             Log::error('Error fetching my recipes: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat memuat resep Anda.');
+        }
+    }
+
+    public function addComment(Request $request)
+    {
+        try {
+            $request->validate([
+                'comment_text' => 'required|string',
+                'recipe_id' => 'required|exists:recipes,id',
+            ]);
+
+            $comment = Comment::create([
+                'comment_text' => $request->comment_text,
+                'user_id' => Auth::id(),
+                'recipe_id' => $request->recipe_id,
+                'isRead' => false,
+            ]);
+
+            // Buat notifikasi untuk pemilik resep
+            $recipe = Recipe::find($request->recipe_id);
+            if ($recipe && $recipe->user_id !== Auth::id()) {
+                Notification::create([
+                    'user_id' => $recipe->user_id,
+                    'recipe_id' => $recipe->id,
+                    'type' => 'comment',
+                    'message' => 'Ada komentar baru pada resep Anda.',
+                ]);
+            }
+
+            return response()->json([
+                'comment' => $comment,
+                'authorName' => Auth::user()->name,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error adding comment: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to add comment',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroyComment($id)
+    {
+        try {
+            $comment = Comment::findOrFail($id);
+
+            // Periksa apakah pengguna yang sedang login adalah pemilik komentar
+            if ($comment->user_id !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to delete this comment.',
+                ], 403);
+            }
+
+            $comment->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Comment deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error deleting comment: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete comment.',
+            ]);
+        }
+    }
+
+    public function updateComment(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'comment_text' => 'required|string',
+            ]);
+
+            $comment = Comment::findOrFail($id);
+
+            // Periksa apakah pengguna yang sedang login adalah pemilik komentar
+            if ($comment->user_id !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to edit this comment.',
+                ], 403);
+            }
+
+            $comment->update([
+                'comment_text' => $request->comment_text
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Comment updated successfully.',
+                'comment' => $comment
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating comment: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update comment.',
+            ], 500);
         }
     }
 }

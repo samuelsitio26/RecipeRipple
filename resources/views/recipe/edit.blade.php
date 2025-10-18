@@ -397,9 +397,9 @@
                     <button type="submit" class="btn btn-custom" id="submitBtn">
                         <i class="fas fa-save me-1"></i>Perbarui
                     </button>
-                    <a href="{{ route('recipe.index') }}" class="btn btn-custom">
+                    <button type="button" class="btn btn-custom" onclick="history.back()">
                         <i class="fas fa-times me-1"></i>Batal
-                    </a>
+                    </button>
                 </div>
             </nav>
 
@@ -529,13 +529,14 @@
                         <i class="fas fa-camera me-1"></i>Pilih Gambar
                     </button>
                     <input type="file" id="gambar" name="gambar" accept="image/*"
-                        aria-describedby="gambarError">
+                        aria-describedby="gambarError" style="display: none;">
+
                     @if (!empty($data['recipe']['gambar']))
-                        <div class="existing-image-container">
-                            <img id="imagePreview"
+                        <div class="existing-image-container" id="existingImageContainer">
+                            <img id="existingImagePreview"
                                 src="{{ asset('uploads/recipe/gambar/' . $data['recipe']['gambar']) }}"
                                 alt="Preview gambar resep"
-                                style="max-width: 300px; max-height: 200px; object-fit: cover; border: 2px solid #ddd; border-radius: 10px;">
+                                style="max-width: 300px; max-height: 200px; object-fit: cover; border: 2px solid #ddd; border-radius: 10px; margin-top: 10px; display: block;">
                             <div class="image-controls mt-2">
                                 <button type="button" class="btn btn-sm btn-primary"
                                     onclick="document.getElementById('gambar').click()">
@@ -550,20 +551,24 @@
                                 {{ $data['recipe']['gambar'] }}
                             </p>
                         </div>
-                    @else
+                    @endif
+
+                    <!-- Preview untuk gambar baru -->
+                    <div id="newImageContainer" style="display: none;">
                         <img id="imagePreview"
-                            style="display: none; max-width: 300px; max-height: 200px; object-fit: cover;"
-                            alt="Preview gambar resep">
-                        <div id="imageControls" class="image-controls mt-2" style="display: none;">
+                            style="max-width: 300px; max-height: 200px; object-fit: cover; border: 2px solid #ddd; border-radius: 10px; margin-top: 10px;"
+                            alt="Preview gambar baru">
+                        <div id="imageControls" class="image-controls mt-2">
                             <button type="button" class="btn btn-sm btn-primary"
                                 onclick="document.getElementById('gambar').click()">
                                 <i class="fas fa-sync-alt me-1"></i>Ganti Gambar
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="removeCurrentImage()">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeNewImage()">
                                 <i class="fas fa-trash me-1"></i>Hapus Gambar
                             </button>
                         </div>
-                    @endif
+                    </div>
+
                     <div class="error-message" id="gambarError"></div>
                 </div>
 
@@ -683,7 +688,7 @@
         function previewImage(input, previewId) {
             const file = input.files[0];
             const preview = document.getElementById(previewId);
-            const imageControls = document.getElementById('imageControls');
+            const newImageContainer = document.getElementById('newImageContainer');
 
             if (file) {
                 const error = validateFile(file);
@@ -698,10 +703,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    if (imageControls) {
-                        imageControls.style.display = 'block';
-                    }
+                    newImageContainer.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
@@ -710,24 +712,16 @@
         // Remove current image function
         function removeCurrentImage() {
             if (confirm('Apakah Anda yakin ingin menghapus gambar ini?')) {
-                const preview = document.getElementById('imagePreview');
                 const imageInput = document.getElementById('gambar');
-                const imageControls = document.getElementById('imageControls');
-                const existingImageContainer = document.querySelector('.existing-image-container');
+                const existingImageContainer = document.getElementById('existingImageContainer');
 
                 // Hide existing image container
                 if (existingImageContainer) {
                     existingImageContainer.style.display = 'none';
                 }
 
-                // Clear preview and input
-                preview.src = '';
-                preview.style.display = 'none';
+                // Clear input
                 imageInput.value = '';
-
-                if (imageControls) {
-                    imageControls.style.display = 'none';
-                }
 
                 // Add hidden input to indicate image removal
                 let removeImageInput = document.getElementById('remove_image_input');
@@ -752,26 +746,46 @@
             }
         }
 
+        // Remove new uploaded image function
+        function removeNewImage() {
+            if (confirm('Apakah Anda yakin ingin menghapus gambar ini?')) {
+                const imageInput = document.getElementById('gambar');
+                const newImageContainer = document.getElementById('newImageContainer');
+
+                // Clear input and hide new image container
+                imageInput.value = '';
+                newImageContainer.style.display = 'none';
+
+                // Show existing image container if it exists
+                const existingImageContainer = document.getElementById('existingImageContainer');
+                if (existingImageContainer) {
+                    existingImageContainer.style.display = 'block';
+                }
+            }
+        }
+
         // Main image handler
         document.getElementById('gambar').addEventListener('change', function() {
-            previewImage(this, 'imagePreview');
+            if (this.files[0]) {
+                previewImage(this, 'imagePreview');
 
-            // Hide existing image container if new image is selected
-            const existingImageContainer = document.querySelector('.existing-image-container');
-            if (existingImageContainer && this.files[0]) {
-                existingImageContainer.style.display = 'none';
-            }
+                // Hide existing image container if new image is selected
+                const existingImageContainer = document.getElementById('existingImageContainer');
+                if (existingImageContainer) {
+                    existingImageContainer.style.display = 'none';
+                }
 
-            // Remove "image removed" message if exists
-            const removedMessage = document.getElementById('image_removed_message');
-            if (removedMessage) {
-                removedMessage.remove();
-            }
+                // Remove "image removed" message if exists
+                const removedMessage = document.getElementById('image_removed_message');
+                if (removedMessage) {
+                    removedMessage.remove();
+                }
 
-            // Remove hidden remove_image input if exists
-            const removeImageInput = document.getElementById('remove_image_input');
-            if (removeImageInput) {
-                removeImageInput.remove();
+                // Remove hidden remove_image input if exists
+                const removeImageInput = document.getElementById('remove_image_input');
+                if (removeImageInput) {
+                    removeImageInput.remove();
+                }
             }
         });
 

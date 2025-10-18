@@ -23,9 +23,7 @@
             color: #ffffff;
         }
 
-        .btn-search {
-            width: 300px;
-        }
+
 
         /* Navbar Styles */
         .navbar {
@@ -105,11 +103,9 @@
                         <a class="nav-link" href="#contact" style="font-size: 18px;">Contact</a>
                     </li>
                 </ul>
-                <form class="d-flex ms-3">
-                    <input class="form-control me-2 btn-search" type="search" placeholder="Cari resep favoritmu..."
-                        aria-label="Search">
+                <div class="ms-3">
                     <a href="login" class="btn btn-sign">Login</a>
-                </form>
+                </div>
             </div>
         </div>
     </nav>
@@ -138,32 +134,48 @@
     <section class="popular-recipes py-5">
         <div class="container text-center">
             <h2><strong>Popular Recipes</strong></h2>
-            <div class="row">
-                <div class="col-6 col-md-3">
-                    <div class="recipe-card shadow-sm p-3 mb-5 bg-white rounded">
-                        <img src="{{ url('frontend/images/nasigoreng.png') }}" class="img-fluid" alt="Nasi Goreng">
-                        <h5 class="mt-2">Nasi Goreng</h5>
+            <div class="row justify-content-center">
+                @forelse($popularRecipes as $recipe)
+                    <div class="col-6 col-lg-3 col-md-4">
+                        <div class="recipe-card shadow-sm p-3 mb-5 bg-white rounded">
+                            <a href="{{ route('resep.show', $recipe->id) }}" class="text-decoration-none text-dark">
+                                @if ($recipe->gambar)
+                                    <img src="{{ asset('uploads/recipe/gambar/' . $recipe->gambar) }}" class="img-fluid"
+                                        alt="{{ $recipe->name }}"
+                                        style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;">
+                                @else
+                                    <div
+                                        style="width: 100%; height: 150px; background-color: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-image" style="font-size: 2rem; color: #dee2e6;"></i>
+                                    </div>
+                                @endif
+                                <h5 class="mt-2">{{ Str::limit($recipe->name, 20) }}</h5>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <div class="rating">
+                                        <i class="fas fa-star" style="color: #FFD700;"></i>
+                                        <span>{{ number_format($recipe->ratings_avg_rating ?? 0, 1) }}</span>
+                                    </div>
+                                    <div class="comments">
+                                        <i class="fas fa-comment" style="color: #666;"></i>
+                                        <span>{{ $recipe->comments_count }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="recipe-card shadow-sm p-3 mb-5 bg-white rounded">
-                        <img src="{{ url('frontend/images/buburkacanghijau.png') }}" class="img-fluid"
-                            alt="Bubur Kacang Hijau">
-                        <h5 class="mt-2">Bubur Kacang Hijau</h5>
+                @empty
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-utensils" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                            <h5 class="text-muted">Belum ada resep tersedia</h5>
+                            <p class="text-muted">Jadilah yang pertama berbagi resep lezat!</p>
+                            <a href="/login" class="btn"
+                                style="background-color: #F44708; color: white; margin-top: 1rem;">
+                                <i class="fas fa-plus me-2"></i>Login untuk Menulis Resep
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="recipe-card shadow-sm p-3 mb-5 bg-white rounded">
-                        <img src="{{ url('frontend/images/kuelapis.png') }}" class="img-fluid" alt="Kue Lapis">
-                        <h5 class="mt-2">Kue Lapis</h5>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="recipe-card shadow-sm p-3 mb-5 bg-white rounded">
-                        <img src="{{ url('frontend/images/cendol.png') }}" class="img-fluid" alt="Cendol">
-                        <h5 class="mt-2">Cendol</h5>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -178,63 +190,44 @@
             <div class="carousel-inner">
                 <div class="carousel-item active">
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="card category-card"
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <img src="{{ url('frontend/images/appetizer.png') }}" class="mt-4"
-                                    alt="Appetizer image" style="width: 75%; height:75%; border-radius:15px;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Appetizer</h5>
-                                    <p class="card-text">Lihat resep</p>
-                                    <div class="rating">
-                                        <i class="fas fa-star"></i>
-                                        <span>4.9</span>
-                                        <i class="fas fa-comment" style="margin-left: 210px;"></i>
-                                    </div>
-                                    <div class="heart-icon">
-                                        <i class="fas fa-heart" id="heart-icon"></i>
+                        @forelse($categories as $category)
+                            <div class="col-md-4">
+                                <div class="card category-card"
+                                    style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                    @php
+                                        // Default images untuk kategori berdasarkan nama
+                                        $categoryImages = [
+                                            'appetizer' => 'appetizer.png',
+                                            'main course' => 'maincourse.png',
+                                            'dessert' => 'dessert.png',
+                                        ];
+                                        $imageName = $categoryImages[strtolower($category->nama)] ?? 'maincourse.png';
+                                    @endphp
+                                    <img src="{{ url('frontend/images/' . $imageName) }}" class="mt-4"
+                                        alt="{{ $category->nama }}"
+                                        style="width: 75%; height:200px; object-fit: cover; border-radius:15px;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ $category->nama }}</h5>
+                                        <p class="card-text">{{ $category->recipe_count }} resep tersedia</p>
+                                        <div class="rating">
+                                            <i class="fas fa-star" style="color: #FFD700;"></i>
+                                            <span>{{ number_format($category->avg_rating, 1) }}</span>
+                                            <i class="fas fa-comment" style="margin-left: 150px; color: #666;"></i>
+                                            <span>{{ $category->total_comments }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card category-card"
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <img src="{{ url('frontend/images/maincourse.png') }}" class="mt-4"
-                                    alt="maincourse image" style="width: 75%; height:75%; border-radius:15px;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Main Course</h5>
-                                    <p class="card-text">Lihat resep</p>
-                                    <div class="rating">
-                                        <i class="fas fa-star"></i>
-                                        <span>4.6</span>
-                                        <i class="fas fa-comment" style="margin-left: 210px;"></i>
-                                    </div>
-                                </div>
-                                <div class="heart-icon">
-                                    <i class="fas fa-heart"></i>
+                        @empty
+                            <div class="col-12">
+                                <div class="text-center py-5">
+                                    <i class="fas fa-tags"
+                                        style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                                    <h5 class="text-muted">Belum ada kategori tersedia</h5>
+                                    <p class="text-muted">Kategori akan muncul otomatis saat ada resep yang dibuat.</p>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card category-card"
-                                style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                                <img src="{{ url('frontend/images/dessert.png') }}" class="mt-4"
-                                    alt="Appetizer image" style="width: 75%; height:75%; border-radius:15px;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Dessert</h5>
-                                    <p class="card-text">Lihat resep</p>
-                                    <div class="rating">
-                                        <i class="fas fa-star"></i>
-                                        <span>4.8</span>
-                                        <i class="fas fa-comment" style="margin-left: 210px;"></i>
-                                    </div>
-                                </div>
-                                <div class="heart-icon">
-                                    <i class="fas fa-heart"></i>
-                                </div>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
