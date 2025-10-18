@@ -1,0 +1,11 @@
+[phases]
+php_version = "8.2"
+
+[steps]
+# Add required PHP extensions first
+pre_composer = [
+  "install-php-extensions intl zip"
+]
+
+# Default composer install is handled by Railpack, but we keep this for clarity
+composer_install_args = ["--optimize-autoloader", "--no-scripts", "--no-interaction"]
