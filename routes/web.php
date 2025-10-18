@@ -87,18 +87,7 @@ Route::get('/writeresep', function () {
 
 // Route::get('/notifikasi', [NotifikasiController::class, 'show']);
 
-Route::get('/profil', function () {
-    return view('profilPage');
-});
-
-Route::get('/editprofil', function () {
-    return view('editprofilePage');
-});
-
-Route::get('/updateprofil', function () {
-    return view('updateprofilPage');
-});
-
+// Profile routes - using ProfileController
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/editprofil', [ProfileController::class, 'edit'])->name('profile.edit');
 Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
