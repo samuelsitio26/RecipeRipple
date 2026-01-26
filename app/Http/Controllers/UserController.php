@@ -31,7 +31,7 @@ class UserController extends Controller
             'name' => $request->name,
             'nomor_telepon' => $request->nomor_telepon,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Enkripsi password
+            'password' => Hash::make($request->password), // Enkripsi password  
             'role' => 'user', // Set default role 'user'
         ]);
 
@@ -40,7 +40,7 @@ class UserController extends Controller
 
     // Mengupdate data pengguna yang ada
     public function update(Request $request, $id)
-    
+
     {
         $user = User::findOrFail($id);
 

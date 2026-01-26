@@ -44,12 +44,46 @@
       align-items: center;
     }
 
+    /* Back arrow styles */
+    .back-arrow {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      text-decoration: none;
+      color: #F44708;
+      font-size: 20px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+      z-index: 10;
+      outline: none;
+    }
+
+    .back-arrow:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(244,68,8,0.18);
+      opacity: 0.96;
+    }
+
+    .back-arrow:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 12px rgba(244,68,8,0.12);
+    }
+
   </style>
 
 </head>
 <body>
-  <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 bg-image">
-    <div class="login-box p-4 shadow-lg rounded">
+  <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 bg-image" style="position: relative;">
+    <div class="login-box p-4 shadow-lg rounded" style="position: relative;">
+      <!-- Back Arrow Button (inside login-box) -->
+      <a href="/" class="back-arrow" aria-label="Back to home">&#8592;</a>
       <div class="text-center mb-4">
         <img src="{{url('frontend/images/Logo.png')}}" alt="Logo" width="50" class="mb-3" style="border-radius: 50%;">
         <br>
